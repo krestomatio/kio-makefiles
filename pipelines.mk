@@ -14,7 +14,7 @@ include $(MK_PIPELINES_PR_FILE)
 ## Release
 include $(MK_PIPELINES_RELEASE_FILE)
 
-## else if not SKIP_PIPELINE
+## else if SKIP_PIPELINE
 else
 $(info SKIP_PIPELINE set:)
 

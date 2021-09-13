@@ -26,7 +26,7 @@ BUILD_REGISTRY_PATH ?= docker-registry.jx.krestomat.io/krestomatio
 BUILD_OPERATOR_NAME ?= $(OPERATOR_NAME)
 BUILD_IMAGE_TAG_BASE ?= $(BUILD_REGISTRY_PATH)/$(BUILD_OPERATOR_NAME)
 ifeq ($(JOB_NAME),release)
-BUILD_VERSION ?= $(shell git rev-parse HEAD^2 &>/dev/null && git rev-parse HEAD^2 || echo)
+BUILD_VERSION ?= $(shell git rev-parse HEAD^2 2>\&1 >/dev/null && git rev-parse HEAD^2 || echo)
 else
 BUILD_VERSION ?= $(shell git rev-parse HEAD 2> /dev/null  || echo)
 endif
