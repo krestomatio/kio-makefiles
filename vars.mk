@@ -63,7 +63,11 @@ SKOPEO_DEST_TLS ?= true
 
 # Release
 GIT_REMOTE ?= origin
-GIT_BRANCH ?= master
+ifneq ($(origin PULL_BASE_REF),undefined)
+GIT_BRANCH ?= $(PULL_BASE_REF)
+else
+GIT_BRANCH ?= $(shell git branch 2>/dev/null | grep -q '\bmain\b' && echo main || echo master)
+endif
 GIT_ADD_FILES ?= Makefile
 CHANGELOG_FILE ?= CHANGELOG.md
 
