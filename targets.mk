@@ -21,6 +21,11 @@ git: ## Git add, commit, tag and push
 	git tag v$(VERSION)
 	git push $(GIT_REMOTE) $(GIT_BRANCH) --tags
 
+.PHONY: set-manager-image
+set-manager-image: ## Set manager image using kustomize
+	@echo "+ $@"
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMAGE_TAG_BASE):$(VERSION)
+
 .PHONY: skopeo-copy
 skopeo-copy: ## Copy images using skopeo
 	@echo "+ $@"
