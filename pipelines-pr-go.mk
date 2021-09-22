@@ -5,5 +5,4 @@ lint: go-lint ## Run linting tasks
 k8s: pr ## Run k8s tasks
 
 .PHONY: pr
-pr: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
-pr: image-build image-push deploy undeploy ## Run pr tasks
+pr: testing-deploy testing-undeploy ## Run pr tasks
