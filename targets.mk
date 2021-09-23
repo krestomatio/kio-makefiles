@@ -13,6 +13,9 @@ image-push: ## Push container image with the manager.
 	@echo "+ $@"
 	$(CONTAINER_BUILDER) push $(IMG)
 
+testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
+testing-image: image-build image-push ## Build and push testing image
+
 .PHONY: git
 git: ## Git add, commit, tag and push
 	@echo "+ $@"

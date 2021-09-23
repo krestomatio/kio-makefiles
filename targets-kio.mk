@@ -1,7 +1,6 @@
 ##@ Testing deploy
 
-testing-deploy: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
-testing-deploy: image-build image-push testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples ## Test deployment using kustomize
+testing-deploy: testing-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples ## Test deployment using kustomize
 
 testing-deploy-prepare: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-deploy-prepare:
