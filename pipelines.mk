@@ -1,6 +1,6 @@
 ##@ Pipelines
 
-MK_PIPELINES_PR_FILE ?= $(MK_INCLUDE_DIR)/pipelines-pr-$(OPERATOR_TYPE).mk
+MK_PIPELINES_PR_FILE ?= $(MK_INCLUDE_DIR)/pipelines-pr-$(PROJECT_TYPE).mk
 MK_PIPELINES_PR_SKIP_FILE ?= $(MK_INCLUDE_DIR)/pipelines-pr-skip.mk
 MK_PIPELINES_RELEASE_FILE ?= $(MK_INCLUDE_DIR)/pipelines-release.mk
 MK_PIPELINES_RELEASE_SKIP_FILE ?= $(MK_INCLUDE_DIR)/pipelines-release-skip.mk

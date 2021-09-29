@@ -6,6 +6,8 @@ MK_DIST_FILE ?= Makefile-dist.mk
 MK_PIPELINES_FILE ?= $(MK_INCLUDE_DIR)/pipelines.mk
 
 include $(MK_VARS_FILE)
+ifneq (,$(wildcard $(MK_DIST_FILE)))
 include $(MK_DIST_FILE)
+endif
 include $(MK_TARGET_FILE)
 include $(MK_PIPELINES_FILE)
