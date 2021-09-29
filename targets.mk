@@ -4,6 +4,44 @@ MK_TARGET_CUSTOM_FILE ?= $(MK_INCLUDE_DIR)/targets-$(PROJECT_SHORTNAME).mk
 ifeq ($(origin OPERATOR_TYPE),undefined)
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
+
+.PHONY: kustomize
+KUSTOMIZE = $(shell pwd)/bin/kustomize
+kustomize: ## Download kustomize locally if necessary.
+	@echo "+ $@"
+ifeq (,$(wildcard $(KUSTOMIZE)))
+ifeq (,$(shell which kustomize 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(KUSTOMIZE)) ;\
+	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_$(OS)_$(ARCH).tar.gz | \
+	tar xzf - -C bin/ ;\
+	}
+else
+KUSTOMIZE = $(shell which kustomize)
+endif
+endif
+
+.PHONY: skaffold
+SKAFFOLD = $(shell pwd)/bin/skaffold
+skaffold: ## Download kustomize locally if necessary.
+	@echo "+ $@"
+ifeq (,$(wildcard $(SKAFFOLD)))
+ifeq (,$(shell which skaffold 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(SKAFFOLD)) ;\
+	curl -sSL https://github.com/GoogleContainerTools/skaffold/releases/download/v$(SKAFFOLD_VERSION)/skaffold-$(OS)-$(ARCH) -o $(SKAFFOLD) ;\
+	chmod +x $(SKAFFOLD) ;\
+	}
+else
+SKAFFOLD = $(shell which skaffold)
+endif
+endif
+
 endif
 
 ##@ Common
