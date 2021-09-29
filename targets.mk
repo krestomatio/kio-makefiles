@@ -52,7 +52,11 @@ ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
 else
 	echo no charts
 endif
-	jx changelog create --verbose --version=$(VERSION) --rev=$(CHANGELOG_FROM) --output-markdown=$(CHANGELOG_FILE) --update-release=false
+ifneq ($(LAST_TAG),)
+	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(LAST_TAG) --rev=$${PULL_BASE_SHA:-HEAD} --output-markdown=$(CHANGELOG_FILE) --update-release=false
+else
+	jx changelog create --verbose --version=$(VERSION) --rev=$${PULL_BASE_SHA:-HEAD} --output-markdown=$(CHANGELOG_FILE) --update-release=false
+endif
 	git add $(CHANGELOG_FILE)
 
 ifneq (,$(wildcard $(MK_INCLUDE_DIR)/targets-$(OPERATOR_SHORTNAME).mk))

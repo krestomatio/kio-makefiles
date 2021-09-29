@@ -42,11 +42,7 @@ ifeq ($(BUILD_VERSION),)
 SKIP_PIPELINE = true
 $(info BUILD_VERSION not set, skipping...)
 endif
-ifeq ($(origin PULL_BASE_SHA),undefined)
-CHANGELOG_FROM ?= HEAD~1
-else
-CHANGELOG_FROM ?= $(PULL_BASE_SHA)
-endif
+LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
 
 # molecule
 MOLECULE_SEQUENCE ?= test
