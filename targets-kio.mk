@@ -1,6 +1,6 @@
 ##@ Testing deploy
 
-testing-deploy: testing-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples ## Test deployment using kustomize
+testing-deploy: testing-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
 
 testing-deploy-prepare: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-deploy-prepare:
@@ -31,6 +31,10 @@ testing-deploy-apply:
 	kustomize build config/testing/nfs | kubectl apply -f -
 	kustomize build config/testing/m4e | kubectl apply -f -
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl apply -f -
+
+testing-deploy-samples-safe:
+	@echo "+ $@"
+	@$(MAKE) testing-deploy-samples || { $(MAKE) testing-undeploy; exit 2; }
 
 testing-deploy-samples:
 	@echo "+ $@"
