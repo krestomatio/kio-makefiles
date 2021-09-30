@@ -27,7 +27,7 @@ endif
 
 .PHONY: skaffold
 SKAFFOLD = $(shell pwd)/bin/skaffold
-skaffold: ## Download kustomize locally if necessary.
+skaffold: ## Download skkafold locally if necessary.
 	@echo "+ $@"
 ifeq (,$(wildcard $(SKAFFOLD)))
 ifeq (,$(shell which skaffold 2>/dev/null))
@@ -105,8 +105,8 @@ else
 endif
 	git add $(CHANGELOG_FILE)
 
-ifneq (,$(wildcard $(MK_INCLUDE_CUSTOM_TARGET_FILE)))
-include $(MK_INCLUDE_CUSTOM_TARGET_FILE)
+ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
+include $(MK_TARGET_CUSTOM_FILE)
 endif
 
 include $(MK_TARGET_EXTRA_FILE)
