@@ -23,7 +23,18 @@ CONTAINER_BUILDER ?= docker
 OPERATOR_VERSION ?= 1.11.0
 KUSTOMIZE_VERSION ?= 4.1.3
 OPM_VERSION ?= 1.15.1
-SKAFFOLD_VERSION ?= 1.32.0
+SKAFFOLD_VERSION ?= 1.33.0
+K8S_VERSION ?= 1.20.7
+KUBECTL_VERSION ?= $(K8S_VERSION)
+KIND_VERSION ?= 0.11.1
+KIND_IMAGE_VERSION ?= $(K8S_VERSION)
+G12E_VERSION ?= 2.0.9
+
+# OS
+OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
+CWD := $(shell pwd)
+LOCAL_BIN ?= $(CWD)
 
 # JX
 JOB_NAME ?= pr

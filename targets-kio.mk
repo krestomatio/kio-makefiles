@@ -45,15 +45,15 @@ testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undep
 
 testing-undeploy-samples:
 	@echo "+ $@"
-	kustomize build config/samples | kubectl delete --timeout=600s --wait=true --cascade=foreground -f - || echo
+	kustomize build config/samples | kubectl delete --ignore-not-found=true --timeout=600s --wait=true --cascade=foreground -f - || echo
 
 testing-undeploy-delete:
 	@echo "+ $@"
-	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete -f - || echo
-	kustomize build config/testing/nfs | kubectl delete -f - || echo
-	kustomize build config/testing/m4e | kubectl delete -f - || echo
-	kustomize build config/testing/rook-nfs/server | kubectl delete -f - || echo
-	kustomize build config/testing/rook-nfs/operator | kubectl delete -f - || echo
+	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true -f - || echo
+	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true -f - || echo
+	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true -f - || echo
+	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true -f - || echo
+	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true -f - || echo
 
 testing-undeploy-restore:
 	@echo "+ $@"
@@ -81,4 +81,4 @@ deploy-operators: ## Deploy kio operator and dependant operators to the K8s clus
 
 undeploy-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in ~/.kube/config.
 	@echo "+ $@"
-	kustomize build config/operators | kubectl delete -f -
+	kustomize build config/operators | kubectl delete --ignore-not-found=true -f -

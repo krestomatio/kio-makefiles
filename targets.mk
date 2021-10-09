@@ -5,11 +5,8 @@ ifeq ($(origin OPERATOR_TYPE),undefined)
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
-ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
-
 .PHONY: kustomize
-KUSTOMIZE = $(shell pwd)/bin/kustomize
+KUSTOMIZE = $(LOCAL_BIN)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
 	@echo "+ $@"
 ifeq (,$(wildcard $(KUSTOMIZE)))
@@ -22,23 +19,6 @@ ifeq (,$(shell which kustomize 2>/dev/null))
 	}
 else
 KUSTOMIZE = $(shell which kustomize)
-endif
-endif
-
-.PHONY: skaffold
-SKAFFOLD = $(shell pwd)/bin/skaffold
-skaffold: ## Download skkafold locally if necessary.
-	@echo "+ $@"
-ifeq (,$(wildcard $(SKAFFOLD)))
-ifeq (,$(shell which skaffold 2>/dev/null))
-	@{ \
-	set -e ;\
-	mkdir -p $(dir $(SKAFFOLD)) ;\
-	curl -sSL https://github.com/GoogleContainerTools/skaffold/releases/download/v$(SKAFFOLD_VERSION)/skaffold-$(OS)-$(ARCH) -o $(SKAFFOLD) ;\
-	chmod +x $(SKAFFOLD) ;\
-	}
-else
-SKAFFOLD = $(shell which skaffold)
 endif
 endif
 
@@ -61,6 +41,57 @@ image-push: ## Push container image with the manager.
 
 testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-image: image-build image-push ## Build and push testing image
+
+.PHONY: skaffold
+SKAFFOLD = $(LOCAL_BIN)/bin/skaffold
+skaffold: ## Download kustomize locally if necessary.
+	@echo "+ $@"
+ifeq (,$(wildcard $(SKAFFOLD)))
+ifeq (,$(shell which skaffold 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(SKAFFOLD)) ;\
+	curl -sSL https://github.com/GoogleContainerTools/skaffold/releases/download/v$(SKAFFOLD_VERSION)/skaffold-$(OS)-$(ARCH) -o $(SKAFFOLD) ;\
+	chmod +x $(SKAFFOLD) ;\
+	}
+else
+SKAFFOLD = $(shell which skaffold)
+endif
+endif
+
+.PHONY: kubectl
+KUBECTL = $(LOCAL_BIN)/bin/kubectl
+kubectl: ## Download kubectl locally if necessary.
+	@echo "+ $@"
+ifeq (,$(wildcard $(KUBECTL)))
+ifeq (,$(shell which kubectl 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(KUBECTL)) ;\
+	curl -sSL https://storage.googleapis.com/kubernetes-release/release/v$(KUBECTL_VERSION)/bin/$(OS)/$(ARCH)/kubectl -o $(KUBECTL) ;\
+	chmod +x $(KUBECTL) ;\
+	}
+else
+KUBECTL = $(shell which kubectl)
+endif
+endif
+
+.PHONY: kind
+KIND = $(LOCAL_BIN)/bin/kind
+kind: ## Download kind locally if necessary.
+	@echo "+ $@"
+ifeq (,$(wildcard $(KIND)))
+ifeq (,$(shell which kind 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(KIND)) ;\
+	curl -sSL https://kind.sigs.k8s.io/dl/v$(KIND_VERSION)/kind-$(OS)-$(ARCH) -o $(KIND) ;\
+	chmod +x $(KIND) ;\
+	}
+else
+KIND = $(shell which kind)
+endif
+endif
 
 .PHONY: git
 git: ## Git add, commit, tag and push

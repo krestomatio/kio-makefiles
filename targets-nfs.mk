@@ -6,4 +6,4 @@ deploy-rook: kustomize ## Deploy rook nfs operator to the K8s cluster specified 
 
 undeploy-rook: ## Undeploy rook nfs operator from the K8s cluster specified in ~/.kube/config.
 	@echo "+ $@"
-	$(KUSTOMIZE) build config/rook | kubectl delete -f -
+	$(KUSTOMIZE) build config/rook | kubectl delete --ignore-not-found=true -f -
