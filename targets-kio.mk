@@ -4,7 +4,7 @@ testing-deploy: testing-image testing-deploy-prepare testing-deploy-apply-safe t
 
 testing-deploy-prepare: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-deploy-prepare:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/testing; \
 	kustomize edit set image testing=${OPERATOR_IMAGE}; \
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
@@ -21,11 +21,11 @@ testing-deploy-prepare:
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}
 
 testing-deploy-apply-safe:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(MAKE) testing-deploy-apply || { $(MAKE) testing-undeploy; exit 2; }
 
 testing-deploy-apply:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/testing/rook-nfs/operator | kubectl apply -f -
 	kustomize build config/testing/rook-nfs/server | kubectl apply -f -
 	kustomize build config/testing/nfs | kubectl apply -f -
@@ -33,22 +33,22 @@ testing-deploy-apply:
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl apply -f -
 
 testing-deploy-samples-safe:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(MAKE) testing-deploy-samples || { $(MAKE) testing-undeploy; exit 2; }
 
 testing-deploy-samples:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | kubectl apply -f -
 	kubectl wait --for=condition=ready --timeout=600s Site site-sample
 
 testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undeploy-restore ## Test undeployment using kustomize
 
 testing-undeploy-samples:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | kubectl delete --ignore-not-found=true --timeout=600s --wait=true --cascade=foreground -f - || echo
 
 testing-undeploy-delete:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true -f - || echo
 	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true -f - || echo
 	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true -f - || echo
@@ -56,7 +56,7 @@ testing-undeploy-delete:
 	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true -f - || echo
 
 testing-undeploy-restore:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/testing; \
 	kustomize edit set image testing=testing-operator; \
 	kustomize edit set namespace kio-test; \
@@ -75,10 +75,10 @@ testing-undeploy-restore:
 ##@ Dependant operators
 
 deploy-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in ~/.kube/config.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/operators | kubectl apply -f -
 
 undeploy-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in ~/.kube/config.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/operators | kubectl delete --ignore-not-found=true -f -

@@ -91,3 +91,28 @@ CHANGELOG_FILE ?= CHANGELOG.md
 # krestomatio ansible collection
 COLLECTION_VERSION ?= 0.0.1
 export COLLECTION_FILE ?= krestomatio-k8s-$(COLLECTION_VERSION).tar.gz
+
+# colors
+## from https://gist.github.com/rsperl/d2dfe88a520968fbc1f49db0a29345b9
+## define standard colors
+ifneq (,$(findstring xterm,${TERM}))
+	BLACK        := $(shell tput -Txterm setaf 0)
+	RED          := $(shell tput -Txterm setaf 1)
+	GREEN        := $(shell tput -Txterm setaf 2)
+	YELLOW       := $(shell tput -Txterm setaf 3)
+	LIGHTPURPLE  := $(shell tput -Txterm setaf 4)
+	PURPLE       := $(shell tput -Txterm setaf 5)
+	BLUE         := $(shell tput -Txterm setaf 6)
+	WHITE        := $(shell tput -Txterm setaf 7)
+	RESET := $(shell tput -Txterm sgr0)
+else
+	BLACK        := ""
+	RED          := ""
+	GREEN        := ""
+	YELLOW       := ""
+	LIGHTPURPLE  := ""
+	PURPLE       := ""
+	BLUE         := ""
+	WHITE        := ""
+	RESET        := ""
+endif

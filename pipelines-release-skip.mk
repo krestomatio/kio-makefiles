@@ -1,11 +1,11 @@
 changelog:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping changelog...)
 
 release:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping release...)
 
 promote:
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping promote...)

@@ -8,7 +8,7 @@ help: ## Display this help.
 .PHONY: kustomize
 KUSTOMIZE = $(LOCAL_BIN)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUSTOMIZE)))
 ifeq (,$(shell which kustomize 2>/dev/null))
 	@{ \
@@ -27,7 +27,7 @@ endif
 ##@ Common
 
 image-build: ## Build container image with the manager.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(OPERATOR_TYPE),ansible)
 	$(CONTAINER_BUILDER) build . -t $(IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
@@ -36,7 +36,7 @@ else
 endif
 
 image-push: ## Push container image with the manager.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(CONTAINER_BUILDER) push $(IMG)
 
 testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
@@ -45,7 +45,7 @@ testing-image: image-build image-push ## Build and push testing image
 .PHONY: skaffold
 SKAFFOLD = $(LOCAL_BIN)/bin/skaffold
 skaffold: ## Download kustomize locally if necessary.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(SKAFFOLD)))
 ifeq (,$(shell which skaffold 2>/dev/null))
 	@{ \
@@ -62,7 +62,7 @@ endif
 .PHONY: kubectl
 KUBECTL = $(LOCAL_BIN)/bin/kubectl
 kubectl: ## Download kubectl locally if necessary.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUBECTL)))
 ifeq (,$(shell which kubectl 2>/dev/null))
 	@{ \
@@ -79,7 +79,7 @@ endif
 .PHONY: kind
 KIND = $(LOCAL_BIN)/bin/kind
 kind: ## Download kind locally if necessary.
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KIND)))
 ifeq (,$(shell which kind 2>/dev/null))
 	@{ \
@@ -95,7 +95,7 @@ endif
 
 .PHONY: git
 git: ## Git add, commit, tag and push
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	git add $(GIT_ADD_FILES)
 	git commit -m "chore(release): $(VERSION)" -m "[$(SKIP_MSG)]"
 	git tag v$(VERSION)
@@ -103,12 +103,12 @@ git: ## Git add, commit, tag and push
 
 .PHONY: set-manager-image
 set-manager-image: ## Set manager image using kustomize
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/manager && kustomize edit set image controller=$(IMAGE_TAG_BASE):$(VERSION)
 
 .PHONY: skopeo-copy
 skopeo-copy: ## Copy images using skopeo
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	# full version
 	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION) docker://$(IMAGE_TAG_BASE):$(VERSION)
 	# major + minor
@@ -120,7 +120,7 @@ skopeo-copy: ## Copy images using skopeo
 
 .PHONY: jx-changelog
 jx-changelog: ## Generate changelog file using jx
-	@echo "+ $@"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
 	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
 	sed -i "s/tag:.*/tag: $(VERSION)/" charts/$(REPO_NAME)/values.yaml
