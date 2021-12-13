@@ -58,7 +58,7 @@ local-deploy-db: ## Deploy db manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo "# deploying db, it could take some seconds..."
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/db --load-restrictor LoadRestrictionsNone | kubectl apply -f -
-	$(KUBECTL) wait --for=condition=Available --timeout=90s deploy postgres-deploy
+	$(KUBECTL) -n $(KIND_NAMESPACE) wait --for=condition=Available --timeout=90s deploy postgres-deploy
 
 local-undeploy-base: ## Delete base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
