@@ -4,8 +4,14 @@
 KUSTOMIZE_DIR ?= .config/
 KIND_CLUSTER_NAME ?= kio-web-app
 KIND_NAMESPACE ?= local-kio-web-app-system
+KIO_WEB_APP_ENV ?= local
+ifeq ($(KIO_WEB_APP_ENV),local)
+KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig__dev__kio-web-app
+else
+KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig__$(KIO_WEB_APP_ENV)__kio-web-app
+endif
 
-install: kustomize skaffold kubectl kind kind-create kind-context
+install: kustomize skaffold kubectl kind kind-create kind-context kubeconfig-download
 
 buildah-build: ## Build the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -49,10 +55,12 @@ kind-unpause: ## Unpause kind cluster container
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
 
-local-deploy-base: ## Deploy base manifests for local env
+local-deploy-base: kubeconfig-download ## Deploy base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo "# deploying base..."
+	cp -pf ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME) $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | kubectl apply -f -
+	rm $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 
 local-deploy-db: ## Deploy db manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -69,6 +77,12 @@ local-undeploy-db: ## Delete db manifests for local env
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/db --load-restrictor LoadRestrictionsNone | kubectl delete --ignore-not-found=true -f -
 
 local-purge: local-undeploy-base kind-delete ## Purge local env: base (ns, db, pvc), k8s objects and local cluster
+
+kubeconfig-download: ## download kubeconfig file for kio web app role
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)))
+	gsutil cp gs://$(KIO_WEB_APP_KUBECONFIG_NAME)/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME) ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
+endif
 
 local-dev: install ## Run local dev
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
