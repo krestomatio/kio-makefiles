@@ -6,7 +6,7 @@ help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 .PHONY: kustomize
-KUSTOMIZE = $(LOCAL_BIN)/bin/kustomize
+KUSTOMIZE = $(LOCAL_BIN)/kustomize
 kustomize: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUSTOMIZE)))
@@ -43,7 +43,7 @@ testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-image: image-build image-push ## Build and push testing image
 
 .PHONY: skaffold
-SKAFFOLD = $(LOCAL_BIN)/bin/skaffold
+SKAFFOLD = $(LOCAL_BIN)/skaffold
 skaffold: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(SKAFFOLD)))
@@ -60,7 +60,7 @@ endif
 endif
 
 .PHONY: kubectl
-KUBECTL = $(LOCAL_BIN)/bin/kubectl
+KUBECTL = $(LOCAL_BIN)/kubectl
 kubectl: ## Download kubectl locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUBECTL)))
@@ -77,7 +77,7 @@ endif
 endif
 
 .PHONY: kind
-KIND = $(LOCAL_BIN)/bin/kind
+KIND = $(LOCAL_BIN)/kind
 kind: ## Download kind locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KIND)))

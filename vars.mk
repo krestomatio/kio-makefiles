@@ -34,7 +34,8 @@ G12E_VERSION ?= 2.0.9
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
 CWD := $(shell pwd)
-LOCAL_BIN ?= $(CWD)
+LOCAL_BIN ?= ./bin
+PATH := $(PATH):$(LOCAL_BIN)
 
 # JX
 JOB_NAME ?= pr
