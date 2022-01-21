@@ -92,3 +92,12 @@ ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
 else
 	@bash -c "trap '$(MAKE) local-undeploy-db' EXIT; $(SKAFFOLD) dev"
 endif
+
+local-db: install ## Run local db only
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@[ -f .env ] || { echo "${RED}# .env file does not exist${RESET}"; exit 1; }
+ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
+	$(SKAFFOLD) dev -p db-only
+else
+	bash -c "trap '$(MAKE) local-undeploy-db' EXIT; $(SKAFFOLD) dev -p db-only"
+endif
