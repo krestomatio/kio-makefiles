@@ -62,13 +62,13 @@ local-deploy-base: kubeconfig-download ## Deploy base manifests for local env
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | kubectl apply -f -
 	rm $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 
-local-deploy-db: ## Deploy db manifests for local env
+local-deploy-db: local-deploy-base ## Deploy db manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo "# deploying db, it could take some seconds..."
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/db --load-restrictor LoadRestrictionsNone | kubectl apply -f -
 	$(KUBECTL) -n $(KIND_NAMESPACE) wait --for=condition=Available --timeout=90s deploy postgres-deploy
 
-local-undeploy-base: ## Delete base manifests for local env
+local-undeploy-base: local-undeploy-db ## Delete base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | kubectl delete --ignore-not-found=true -f -
 
