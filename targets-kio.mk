@@ -12,6 +12,9 @@ testing-deploy-prepare:
 	cd config/testing/m4e; \
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
 	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
+	cd config/testing/keydb; \
+	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
+	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
 	cd config/testing/nfs; \
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
 	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
@@ -29,6 +32,7 @@ testing-deploy-apply:
 	kustomize build config/testing/rook-nfs/operator | kubectl apply -f -
 	kustomize build config/testing/rook-nfs/server | kubectl apply -f -
 	kustomize build config/testing/nfs | kubectl apply -f -
+	kustomize build config/testing/keydb | kubectl apply -f -
 	kustomize build config/testing/m4e | kubectl apply -f -
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl apply -f -
 
@@ -51,6 +55,7 @@ testing-undeploy-delete:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true -f - || echo
 	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true -f - || echo
+	kustomize build config/testing/keydb | kubectl delete --ignore-not-found=true -f - || echo
 	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true -f - || echo
 	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true -f - || echo
 	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true -f - || echo
@@ -62,6 +67,9 @@ testing-undeploy-restore:
 	kustomize edit set namespace kio-test; \
 	kustomize edit set nameprefix kio-
 	cd config/testing/m4e; \
+	kustomize edit set namespace kio-test; \
+	kustomize edit set nameprefix kio-
+	cd config/testing/keydb; \
 	kustomize edit set namespace kio-test; \
 	kustomize edit set nameprefix kio-
 	cd config/testing/nfs; \
