@@ -53,12 +53,12 @@ testing-undeploy-samples:
 
 testing-undeploy-delete:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true -f - || echo
-	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true -f - || echo
-	kustomize build config/testing/keydb | kubectl delete --ignore-not-found=true -f - || echo
-	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true -f - || echo
-	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true -f - || echo
-	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true -f - || echo
+	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/keydb | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 
 testing-undeploy-restore:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -89,4 +89,4 @@ deploy-operators: ## Deploy kio operator and dependant operators to the K8s clus
 
 undeploy-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/operators | kubectl delete --ignore-not-found=true -f -
+	kustomize build config/operators | kubectl delete --ignore-not-found=true --timeout=600s -f -
