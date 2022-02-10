@@ -38,7 +38,7 @@ testing-deploy-apply:
 
 testing-deploy-samples-safe:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(MAKE) testing-deploy-samples || { $(MAKE) testing-undeploy; exit 2; }
+	@$(MAKE) testing-deploy-samples || { $(MAKE) testing-manager-logs testing-undeploy; exit 2; }
 
 testing-deploy-samples:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -50,6 +50,10 @@ testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undep
 testing-undeploy-samples:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | kubectl delete --ignore-not-found=true --wait=true --timeout=600s -f - || echo
+
+testing-manager-logs: ## Output logs from all managers in namespace
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	kubectl -n ${TEST_OPERATOR_NAMESPACE} logs -l control-plane=controller-manager -c manager --tail=-1 --limit-bytes=10240000
 
 testing-undeploy-delete:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
