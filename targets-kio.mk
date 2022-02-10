@@ -49,7 +49,7 @@ testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undep
 
 testing-undeploy-samples:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/samples | kubectl delete --ignore-not-found=true --timeout=600s --wait=true --cascade=foreground -f - || echo
+	kustomize build config/samples | kubectl delete --ignore-not-found=true --wait=true --timeout=600s -f - || echo
 
 testing-undeploy-delete:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -59,6 +59,8 @@ testing-undeploy-delete:
 	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	# in case sc remains
+	kubectl delete --ignore-not-found=true sc site-site-sample-nfs-sc || echo
 
 testing-undeploy-restore:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
