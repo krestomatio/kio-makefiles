@@ -58,9 +58,9 @@ testing-manager-logs: ## Output logs from all managers in namespace
 testing-undeploy-delete:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/keydb | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/keydb | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	# in case sc remains
