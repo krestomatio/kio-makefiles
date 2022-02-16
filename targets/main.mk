@@ -1,5 +1,9 @@
-MK_TARGET_EXTRA_FILE ?= $(MK_INCLUDE_DIR)/targets-$(PROJECT_TYPE).mk
-MK_TARGET_CUSTOM_FILE ?= $(MK_INCLUDE_DIR)/targets-$(PROJECT_SHORTNAME).mk
+ifneq (,$(wildcard $(MK_TARGETS_PROJECT_FILE)))
+include $(MK_TARGETS_PROJECT_FILE)
+endif
+ifneq (,$(wildcard $(MK_TARGETS_PROJECT_TYPE_FILE)))
+include $(MK_TARGETS_PROJECT_TYPE_FILE)
+endif
 
 ifeq ($(origin OPERATOR_TYPE),undefined)
 help: ## Display this help.
@@ -39,8 +43,24 @@ image-push: ## Push container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(CONTAINER_BUILDER) push $(IMG)
 
+buildah-build: ## Build the container image using buildah
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq ($(OPERATOR_TYPE),ansible)
+	buildah --storage-driver vfs bud -t $(IMG) . \
+		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
+else
+	buildah --storage-driver vfs bud -t $(IMG) .
+endif
+
+buildah-push: ## Push the container image using buildah
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	buildah --storage-driver vfs push $(IMG)
+
 testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-image: image-build image-push ## Build and push testing image
+
+testing-buildah-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
+testing-buildah-image: buildah-build buildah-push ## Build and push testing image using buildah
 
 .PHONY: skaffold
 SKAFFOLD = $(LOCAL_BIN)/skaffold
@@ -135,6 +155,14 @@ else
 	jx changelog create --verbose --version=$(VERSION) --rev=$${PULL_BASE_SHA:-HEAD} --output-markdown=$(CHANGELOG_FILE) --update-release=false
 endif
 	git add $(CHANGELOG_FILE)
+
+.PHONY: preview
+preview: ## Create preview environment using jx
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\nCreating preview environment..."
+	VERSION=$(BUILD_VERSION) \
+	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
+	jx preview create
 
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)

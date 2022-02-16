@@ -1,3 +1,10 @@
+ifneq (,$(wildcard $(MK_VARS_PROJECT_FILE)))
+include $(MK_VARS_PROJECT_FILE)
+endif
+ifneq (,$(wildcard $(MK_VARS_PROJECT_TYPE_FILE)))
+include $(MK_VARS_PROJECT_TYPE_FILE)
+endif
+
 VERSION ?= 0.0.1
 
 # Operator
@@ -5,17 +12,18 @@ OPERATOR_SHORTNAME ?= osdk
 OPERATOR_NAME ?= $(OPERATOR_SHORTNAME)-operator
 
 # Repo
-REPO_NAME ?= $(OPERATOR_SHORTNAME)-operator
+REPO_NAME ?= $(OPERATOR_NAME)
 REPO_OWNER ?= krestomatio
 
 # Project
 PROJECT_SHORTNAME ?= $(OPERATOR_SHORTNAME)
-PROJECT_TYPE ?= $(OPERATOR_TYPE)
+PROJECT_TYPE ?= $(OPERATOR_TYPE)-operator
 
 # Image
 REGISTRY ?= quay.io
 REGISTRY_PATH ?= $(REGISTRY)/$(REPO_OWNER)
-IMAGE_TAG_BASE ?= $(REGISTRY_PATH)/$(OPERATOR_NAME)
+REGISTRY_PROJECT_NAME ?= $(REPO_NAME)
+IMAGE_TAG_BASE ?= $(REGISTRY_PATH)/$(REGISTRY_PROJECT_NAME)
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 
 # requirements
@@ -43,9 +51,10 @@ PULL_NUMBER ?= 0
 BUILD_ID ?= 0
 
 # Build
-BUILD_REGISTRY_PATH ?= docker-registry.jx.krestomat.io/krestomatio
-BUILD_OPERATOR_NAME ?= $(OPERATOR_NAME)
-BUILD_IMAGE_TAG_BASE ?= $(BUILD_REGISTRY_PATH)/$(BUILD_OPERATOR_NAME)
+BUILD_REGISTRY ?= docker-registry.jx.krestomat.io
+BUILD_REGISTRY_PATH ?= $(BUILD_REGISTRY)/krestomatio
+BUILD_REGISTRY_PROJECT_NAME ?= $(REGISTRY_PROJECT_NAME)
+BUILD_IMAGE_TAG_BASE ?= $(BUILD_REGISTRY_PATH)/$(BUILD_REGISTRY_PROJECT_NAME)
 ifeq ($(JOB_NAME),release)
 BUILD_VERSION ?= $(shell git rev-parse HEAD^2 2>\&1 >/dev/null && git rev-parse HEAD^2 || echo)
 else
@@ -96,6 +105,18 @@ CHANGELOG_FILE ?= CHANGELOG.md
 # krestomatio ansible collection
 COLLECTION_VERSION ?= 0.0.1
 export COLLECTION_FILE ?= krestomatio-k8s-$(COLLECTION_VERSION).tar.gz
+
+## npx commitlint
+ifeq ($(origin PULL_BASE_SHA),undefined)
+COMMITLINT_FROM ?= HEAD~1
+else
+COMMITLINT_FROM ?= $(shell echo "HEAD~$$(git rev-list --count $(PULL_BASE_SHA)...HEAD)")
+endif
+ifeq ($(origin PULL_PULL_SHA),undefined)
+COMMITLINT_TO ?= HEAD
+else
+COMMITLINT_TO ?= $(PULL_PULL_SHA)
+endif
 
 # colors
 ## from https://gist.github.com/rsperl/d2dfe88a520968fbc1f49db0a29345b9

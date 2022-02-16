@@ -1,4 +1,4 @@
-##@ Kio Web App
+##@ Kio Web App API
 
 
 KUSTOMIZE_DIR ?= .config/
@@ -12,17 +12,6 @@ KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig__$(KIO_WEB_APP_ENV)__kio-web-app
 endif
 
 install: kustomize skaffold kubectl kind kind-create kind-context kubeconfig-download
-
-buildah-build: ## Build the container image using buildah
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@echo -e "\nBuilding container image..."
-	buildah --storage-driver vfs bud -t $(IMG) .
-
-
-buildah-push: ## Push the container image using buildah
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@echo -e "\nPushing container image..."
-	buildah --storage-driver vfs push $(IMG)
 
 deploy: ## Deploy to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
