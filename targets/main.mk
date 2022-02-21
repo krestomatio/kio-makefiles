@@ -19,7 +19,7 @@ ifeq (,$(shell which kustomize 2>/dev/null))
 	set -e ;\
 	mkdir -p $(dir $(KUSTOMIZE)) ;\
 	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_$(OS)_$(ARCH).tar.gz | \
-	tar xzf - -C bin/ ;\
+	tar xzf - -C $(dir $(KUSTOMIZE))/ ;\
 	}
 else
 KUSTOMIZE = $(shell which kustomize)
@@ -110,6 +110,24 @@ ifeq (,$(shell which kind 2>/dev/null))
 	}
 else
 KIND = $(shell which kind)
+endif
+endif
+
+.PHONY: vault
+VAULT = $(LOCAL_BIN)/vault
+vault: ## Download vault CLI locally if necessary.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(VAULT)))
+ifeq (,$(shell which vault 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(VAULT)) ;\
+	curl -sSL https://releases.hashicorp.com/vault/$(VAULT_VERSION)/vault_$(VAULT_VERSION)_$(OS)_$(ARCH).zip -o /tmp/vault_$(VAULT_VERSION)_$(OS)_$(ARCH).zip ;\
+	unzip -d $(dir $(KUSTOMIZE))/ /tmp/vault_$(VAULT_VERSION)_$(OS)_$(ARCH).zip ;\
+	chmod +x $(VAULT) ;\
+	}
+else
+VAULT = $(shell which vault)
 endif
 endif
 

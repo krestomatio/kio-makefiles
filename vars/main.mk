@@ -118,6 +118,10 @@ else
 COMMITLINT_TO ?= $(PULL_PULL_SHA)
 endif
 
+## VAULT
+VAULT_VERSION ?= 1.9.3
+VAULT_ADDR ?= https://vault.jx.krestomat.io
+
 # colors
 ## from https://gist.github.com/rsperl/d2dfe88a520968fbc1f49db0a29345b9
 ## define standard colors
