@@ -1,4 +1,4 @@
-##@ Kio Web App
+##@ Node
 
 install: nvm-install npm-install ## Install NVM and NPM
 
@@ -49,16 +49,3 @@ npm-pretty: ## NPM pretty
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nRunning 'npm run pretty':"
 	@bash -l -c 'npm run pretty'
-
-## Secrets
-kio-api-env: ## Inject .env in helmfile values
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@echo -e "\nInjecting kio-api-env in helmfile values"
-	set -u ; echo -e "\nkio_api_env: |\n  $${KIO_API_ENV//$$'\n'/$$'\n'  }" >> preview/values.yaml.gotmpl
-	sed -i 's@http://localhost:5000@https://{{ requiredEnv "APP_NAME" }}-{{ requiredEnv "PREVIEW_NAMESPACE" }}.jx.krestomat.io@' preview/values.yaml.gotmpl
-
-config-js: ## Inject config.js in helmfile values
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@echo -e "\nInjecting config.js in helmfile values"
-	set -u ; echo -e "\npublic_config_js: |\n  $${PUBLIC_CONFIG_JS//$$'\n'/$$'\n'  }" >> preview/values.yaml.gotmpl
-	sed -i 's@http://localhost:5000@https://{{ requiredEnv "APP_NAME" }}-{{ requiredEnv "PREVIEW_NAMESPACE" }}.jx.krestomat.io@' preview/values.yaml.gotmpl

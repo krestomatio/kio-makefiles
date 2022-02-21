@@ -15,6 +15,7 @@ kustomize: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUSTOMIZE)))
 ifeq (,$(shell which kustomize 2>/dev/null))
+	$(info Downloading kustomize to $(KUSTOMIZE))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KUSTOMIZE)) ;\
@@ -68,6 +69,7 @@ skaffold: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(SKAFFOLD)))
 ifeq (,$(shell which skaffold 2>/dev/null))
+	$(info Downloading skaffold to $(SKAFFOLD))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(SKAFFOLD)) ;\
@@ -85,6 +87,7 @@ kubectl: ## Download kubectl locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUBECTL)))
 ifeq (,$(shell which kubectl 2>/dev/null))
+	$(info Downloading kubectl to $(KUBECTL))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KUBECTL)) ;\
@@ -102,6 +105,7 @@ kind: ## Download kind locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KIND)))
 ifeq (,$(shell which kind 2>/dev/null))
+	$(info Downloading kind to $(KIND))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KIND)) ;\
@@ -119,6 +123,7 @@ vault: ## Download vault CLI locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(VAULT)))
 ifeq (,$(shell which vault 2>/dev/null))
+	$(info Downloading vault to $(VAULT))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(VAULT)) ;\

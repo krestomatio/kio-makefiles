@@ -11,7 +11,7 @@ else
 KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig__$(KIO_WEB_APP_ENV)__kio-web-app
 endif
 
-install: kustomize skaffold kubectl kind kind-create kind-context kubeconfig-download-if
+install: kustomize skaffold kubectl kind kind-create kind-context kubeconfig-download-if dot-env-download-if
 
 deploy: ## Deploy to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -67,16 +67,6 @@ local-undeploy-db: ## Delete db manifests for local env
 
 local-purge: local-undeploy-base kind-delete ## Purge local env: base (ns, db, pvc), k8s objects and local cluster
 
-kubeconfig-download-if: ## download kubeconfig file for kio web app role, but only if it does not exist on disk
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (,$(wildcard ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)))
-	gsutil cp gs://$(KIO_WEB_APP_KUBECONFIG_NAME)/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME) ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
-endif
-
-kubeconfig-download: ## download and overwrite kubeconfig file for kio web app role
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	gsutil cp gs://$(KIO_WEB_APP_KUBECONFIG_NAME)/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME) ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
-
 local-dev: install ## Run local dev
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@[ -f .env ] || { echo "${RED}# .env file does not exist${RESET}"; exit 1; }
@@ -94,3 +84,25 @@ ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
 else
 	bash -c "trap '$(MAKE) local-undeploy-db' EXIT; $(SKAFFOLD) dev -p db-only"
 endif
+
+## Download files
+kubeconfig-download-if: vault ## download kubeconfig file for kio web app role, but only if it does not exist on disk
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)))
+	vault kv get -field $(KIO_WEB_APP_KUBECONFIG_NAME) kio_secrets/kio-web-app > ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
+endif
+
+kubeconfig-download: vault ## download and overwrite kubeconfig file for kio web app role
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info $(VAULT_ADDR))
+	vault kv get -field $(KIO_WEB_APP_KUBECONFIG_NAME) kio_secrets/kio-web-app > ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
+
+dot-env-download-if: vault ## download and overwrite .env file for kio web app api, but only if it does not exist on disk
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard .env))
+	vault kv get -field kio-api-env kio_secrets/kio-web-app > .env
+endif
+
+dot-env-download: vault ## download and overwrite .env file for kio web app api
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	vault kv get -field kio-api-env kio_secrets/kio-web-app > .env
