@@ -139,6 +139,14 @@ endif
 .PHONY: git
 git: ## Git add, commit, tag and push
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
+	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
+	sed -i "s/tag:.*/tag: $(VERSION)/" charts/$(REPO_NAME)/values.yaml
+	sed -i "s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
+	git add charts/
+else
+	$(info no charts)
+endif
 	git add $(GIT_ADD_FILES)
 	git commit -m "chore(release): $(VERSION)" -m "[$(SKIP_MSG)]"
 	git tag v$(VERSION)
@@ -164,14 +172,6 @@ skopeo-copy: ## Copy images using skopeo
 .PHONY: jx-changelog
 jx-changelog: ## Generate changelog file using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
-	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
-	sed -i "s/tag:.*/tag: $(VERSION)/" charts/$(REPO_NAME)/values.yaml
-	sed -i "s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
-	git add charts/
-else
-	echo no charts
-endif
 ifneq ($(LAST_TAG),)
 	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(LAST_TAG) --rev=$${PULL_BASE_SHA:-HEAD} --output-markdown=$(CHANGELOG_FILE) --update-release=false
 else
