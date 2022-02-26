@@ -1,7 +1,5 @@
 ##@ Node
 
-install: nvm-install npm-install ## Install NVM and NPM
-
 nvm-install: NVM_VERSION ?= $(shell curl -s "https://github.com/nvm-sh/nvm/releases/latest/download" 2>&1 | sed "s/^.*download\/\([^\"]*\).*/\1/")
 nvm-install: ## Install NVM
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
