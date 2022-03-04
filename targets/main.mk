@@ -141,8 +141,8 @@ git: ## Git add, commit, tag and push
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
 	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
-	sed -i "s/tag:.*/tag: $(VERSION)/" charts/$(REPO_NAME)/values.yaml
-	sed -i "s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
+	sed -i "0,/tag:.*/s@tag:.*@tag: $(VERSION)@" charts/$(REPO_NAME)/values.yaml
+	sed -i "0,/repository:.*/s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
 	git add charts/
 else
 	$(info no charts)
