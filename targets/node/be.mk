@@ -23,9 +23,8 @@ undeploy: ## Undeploy  from the K8s cluster specified in ~/.kube/config.
 
 kind-create: ## Create kind clusters
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (0, $(shell $(KIND) get nodes --name $(KIND_CLUSTER_NAME) 2>/dev/null; echo $$?))
-	$(KIND) create cluster --name $(KIND_CLUSTER_NAME) --image=kindest/node:v$(KIND_IMAGE_VERSION)
-endif
+	@$(KIND) get clusters 2>/dev/null | grep -q $(KIND_CLUSTER_NAME) || \
+	{ $(KIND) create cluster --name $(KIND_CLUSTER_NAME) --image=kindest/node:v$(KIND_IMAGE_VERSION); }
 
 kind-delete: ## Delete kind clusters
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
