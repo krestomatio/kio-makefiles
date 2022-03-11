@@ -1,5 +1,10 @@
 # Makefiles
-
+ifndef PROJECT_SHORTNAME
+$(error PROJECT_SHORTNAME is undefined)
+endif
+ifndef PROJECT_TYPE
+$(error PROJECT_TYPE is undefined)
+endif
 
 MK_INCLUDE_DIR ?= hack/mk
 
