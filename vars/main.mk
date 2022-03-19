@@ -46,6 +46,8 @@ PATH := $(PATH):$(LOCAL_BIN)
 JOB_NAME ?= pr
 PULL_NUMBER ?= 0
 BUILD_ID ?= 0
+PULL_BASE_SHA ?= HEAD
+PULL_PULL_SHA ?= HEAD
 
 # Build
 BUILD_REGISTRY ?= docker-registry.jx.krestomat.io
@@ -55,7 +57,7 @@ BUILD_IMAGE_TAG_BASE ?= $(BUILD_REGISTRY_PATH)/$(BUILD_REGISTRY_PROJECT_NAME)
 ifeq ($(JOB_NAME),release)
 BUILD_VERSION ?= $(shell git rev-parse HEAD^2 2>\&1 >/dev/null && git rev-parse HEAD^2 || echo)
 else
-BUILD_VERSION ?= $(shell git rev-parse HEAD 2> /dev/null  || echo)
+BUILD_VERSION ?= $(shell git rev-parse $(PULL_PULL_SHA) 2> /dev/null  || echo)
 endif
 
 # CI
@@ -104,16 +106,12 @@ COLLECTION_VERSION ?= 0.0.1
 export COLLECTION_FILE ?= krestomatio-k8s-$(COLLECTION_VERSION).tar.gz
 
 ## npx commitlint
-ifeq ($(origin PULL_BASE_SHA),undefined)
+ifeq ($(PULL_BASE_SHA),HEAD)
 COMMITLINT_FROM ?= HEAD~1
 else
 COMMITLINT_FROM ?= $(shell echo "HEAD~$$(git rev-list --count $(PULL_BASE_SHA)...HEAD)")
 endif
-ifeq ($(origin PULL_PULL_SHA),undefined)
-COMMITLINT_TO ?= HEAD
-else
 COMMITLINT_TO ?= $(PULL_PULL_SHA)
-endif
 
 ## VAULT
 export VAULT_ADDR ?= https://vault.jx.krestomat.io

@@ -173,9 +173,9 @@ skopeo-copy: ## Copy images using skopeo
 jx-changelog: ## Generate changelog file using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifneq ($(LAST_TAG),)
-	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(LAST_TAG) --rev=$${PULL_BASE_SHA:-HEAD} --output-markdown=$(CHANGELOG_FILE) --update-release=false
+	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(LAST_TAG) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
 else
-	jx changelog create --verbose --version=$(VERSION) --rev=$${PULL_BASE_SHA:-HEAD} --output-markdown=$(CHANGELOG_FILE) --update-release=false
+	jx changelog create --verbose --version=$(VERSION) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
 endif
 	git add $(CHANGELOG_FILE)
 
