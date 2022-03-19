@@ -5,7 +5,6 @@ ifneq (,$(wildcard $(MK_TARGETS_PROJECT_TYPE_FILE)))
 include $(MK_TARGETS_PROJECT_TYPE_FILE)
 endif
 
-ifeq ($(origin OPERATOR_TYPE),undefined)
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
@@ -27,13 +26,11 @@ KUSTOMIZE = $(shell which kustomize)
 endif
 endif
 
-endif
-
 ##@ Common
 
 image-build: ## Build container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq ($(OPERATOR_TYPE),ansible)
+ifeq ($(PROJECT_TYPE),ansible-operator)
 	$(CONTAINER_BUILDER) build . -t $(IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
 else
@@ -46,7 +43,7 @@ image-push: ## Push container image with the manager.
 
 buildah-build: ## Build the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq ($(OPERATOR_TYPE),ansible)
+ifeq ($(PROJECT_TYPE),ansible-operator)
 	buildah --storage-driver vfs bud -t $(IMG) . \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
 else
