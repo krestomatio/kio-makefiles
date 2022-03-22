@@ -179,16 +179,20 @@ skopeo-copy: ## Copy images using skopeo
 .PHONY: jx-updatebot
 jx-updatebot: ## Create PRs in downstream repos with new version using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq ($(GIT_RELEASE_BRANCH_NUMBER),)
 	jx updatebot pr -c .lighthouse/$(UPDATEBOT_CONFIG_FILE) \
 		--commit-title "$(UPDATEBOT_COMMIT_MESSAGE)" \
 		--labels test_group \
 		--version $(VERSION)
+else
+	@echo -e "Release branch '$(GIT_BRANCH)', not running updatebot"
+endif
 
 .PHONY: jx-changelog
 jx-changelog: ## Generate changelog file using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifneq ($(LAST_TAG),)
-	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(LAST_TAG) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
+ifneq ($(CHANGELOG_LAST_TAG),)
+	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(CHANGELOG_LAST_TAG) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
 else
 	jx changelog create --verbose --version=$(VERSION) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
 endif

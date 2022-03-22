@@ -73,21 +73,6 @@ ifeq ($(BUILD_VERSION),)
 SKIP_PIPELINE = true
 $(info BUILD_VERSION not set, skipping...)
 endif
-LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
-
-# molecule
-MOLECULE_SEQUENCE ?= test
-MOLECULE_SCENARIO ?= default
-ifeq ($(PULL_NUMBER),0)
-TEST_SUBINDEX := 0
-else
-TEST_SUBINDEX := $(shell date +%s | tail -c 3)
-endif
-export OPERATOR_IMAGE ?= $(IMG)
-export TEST_OPERATOR_NAMEPREFIX ?= $(OPERATOR_SHORTNAME)-$(JOB_NAME)-$(PULL_NUMBER)-$(TEST_SUBINDEX)-
-export TEST_OPERATOR_NAMESPACE ?= $(OPERATOR_SHORTNAME)-$(JOB_NAME)-$(PULL_NUMBER)-$(TEST_SUBINDEX)-ns
-export TEST_OPERATOR_OMIT_CRDS_DELETION ?= true
-export TEST_OPERATOR_SHORTNAME ?= $(OPERATOR_SHORTNAME)
 
 # skopeo
 SKOPEO_SRC_TLS ?= True
@@ -98,23 +83,13 @@ GIT_REMOTE ?= origin
 ifneq ($(origin PULL_BASE_REF),undefined)
 GIT_BRANCH ?= $(PULL_BASE_REF)
 else
-GIT_BRANCH ?= $(shell git branch 2>/dev/null | grep -q '\bmain\b' && echo main || echo master)
+GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
 endif
+GIT_LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
 GIT_ADD_FILES ?= Makefile config/manager/kustomization.yaml
+GIT_RELEASE_BRANCH_NUMBER ?= $(shell echo $(GIT_BRANCH) | grep -q '^release.[[:digit:]].[[:digit:]]' && echo $${GIT_BRANCH#*release-} || echo '' )
 CHANGELOG_FILE ?= CHANGELOG.md
-RELEASE_BRANCH_REGEX ?= ^release-([0-9]+)\.([0-9]+)$$
-
-# krestomatio ansible collection
-COLLECTION_VERSION ?= 0.0.1
-export COLLECTION_FILE ?= krestomatio-k8s-$(COLLECTION_VERSION).tar.gz
-
-## npx commitlint
-ifeq ($(PULL_BASE_SHA),HEAD)
-COMMITLINT_FROM ?= HEAD~1
-else
-COMMITLINT_FROM ?= $(shell echo "HEAD~$$(git rev-list --count $(PULL_BASE_SHA)...HEAD)")
-endif
-COMMITLINT_TO ?= $(PULL_PULL_SHA)
+CHANGELOG_LAST_TAG ?= $(GIT_LAST_TAG)
 
 ## VAULT
 export VAULT_ADDR ?= https://vault.jx.krestomat.io
