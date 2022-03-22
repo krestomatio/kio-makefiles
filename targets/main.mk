@@ -28,6 +28,16 @@ endif
 
 ##@ Common
 
+start-dockerd: ## Start docker daemon in background (if not running) (meant to be run in container)
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(shell pidof dockerd))
+	$(info starting dockerd in the backgroud...)
+	dockerd-entrypoint.sh &> /tmp/dockerd.log &
+	@sleep 4
+else
+	$(info dockerd already running...)
+endif
+
 image-build: ## Build container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
@@ -166,6 +176,14 @@ skopeo-copy: ## Copy images using skopeo
 
 ##@ JX
 
+.PHONY: jx-updatebot
+jx-updatebot: ## Create PRs in downstream repos with new version using jx
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	jx updatebot pr -c .lighthouse/$(UPDATEBOT_CONFIG_FILE) \
+		--commit-title "$(UPDATEBOT_COMMIT_MESSAGE)" \
+		--labels test_group \
+		--version $(VERSION)
+
 .PHONY: jx-changelog
 jx-changelog: ## Generate changelog file using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -177,7 +195,7 @@ endif
 	git add $(CHANGELOG_FILE)
 
 .PHONY: preview
-preview: ## Create preview environment using jx
+jx-preview: ## Create preview environment using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment..."
 	VERSION=$(BUILD_VERSION) \

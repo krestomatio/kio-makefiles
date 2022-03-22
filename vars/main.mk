@@ -48,6 +48,8 @@ PULL_NUMBER ?= 0
 BUILD_ID ?= 0
 PULL_BASE_SHA ?= HEAD
 PULL_PULL_SHA ?= HEAD
+UPDATEBOT_CONFIG_FILE ?= updatebot.yaml
+UPDATEBOT_COMMIT_MESSAGE ?= chore(update): bump $(REPO_NAME) $(VERSION)
 
 # Build
 BUILD_REGISTRY ?= docker-registry.jx.krestomat.io
@@ -100,6 +102,7 @@ GIT_BRANCH ?= $(shell git branch 2>/dev/null | grep -q '\bmain\b' && echo main |
 endif
 GIT_ADD_FILES ?= Makefile config/manager/kustomization.yaml
 CHANGELOG_FILE ?= CHANGELOG.md
+RELEASE_BRANCH_REGEX ?= ^release-([0-9]+)\.([0-9]+)$$
 
 # krestomatio ansible collection
 COLLECTION_VERSION ?= 0.0.1
