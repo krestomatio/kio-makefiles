@@ -1,8 +1,6 @@
 changelog: jx-changelog ## Generate changelog
 
-build-image: testing-buildah-image ## Image build, push
-
-preview: helmfile-preview ## Create preview using JX
+deploy: helmfile-preview ## Deploy preview chart using helmfile
 
 release: testing-buildah-image skopeo-copy ## Run release tasks
 

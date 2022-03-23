@@ -1,6 +1,18 @@
+sanity:
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info skipping sanity...)
+
 lint:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping lint...)
+
+build-image:
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info skipping build-image...)
+
+preview:
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info skipping preview...)
 
 pr:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"

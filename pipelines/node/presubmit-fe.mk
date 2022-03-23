@@ -1,4 +1,4 @@
-build-image: testing-buildah-image ## Image build, push during pr pipeline
+build-image: testing-buildah-image ## Image build, push
 
 preview: jx-preview ## Create preview using JX
 

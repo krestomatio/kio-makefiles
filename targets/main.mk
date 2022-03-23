@@ -208,7 +208,7 @@ jx-preview: chart-values ## Create preview environment using jx
 helmfile-preview: chart-values ## Create preview environment using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment with helmfile..."
-	sed -i "s@- jx-values.yaml@# - jx-values.yaml@" preview/helmfile.yaml
+	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" preview/helmfile.yaml
 	APP_NAME=$(HELMFILE_APP_NAME) \
 	SUBDOMAIN=${HELMFILE_APP_NAME} \
 	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \

@@ -1,18 +1,10 @@
-sanity:
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(info skipping sanity...)
-
 changelog:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping changelog...)
 
-build-image:
+deploy:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(info skipping release...)
-
-preview:
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(info skipping release...)
+	$(info skipping deploy...)
 
 release:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
