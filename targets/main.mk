@@ -173,6 +173,43 @@ skopeo-copy: ## Copy images using skopeo
 	# major
 	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION) docker://$(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION)))
 
+helmfile-preview: chart-values ## Create preview environment using helmfile
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\nCreating preview environment with helmfile..."
+	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" preview/helmfile.yaml
+	APP_NAME=$(HELMFILE_APP_NAME) \
+	SUBDOMAIN=${HELMFILE_APP_NAME} \
+	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
+	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
+	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
+	VERSION=$(BUILD_VERSION) \
+	helmfile -f preview sync
+	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" preview/helmfile.yaml
+
+helmfile-preview-destroy: ## Destroy preview environment using helmfile
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\Destroying preview environment with helmfile..."
+	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" preview/helmfile.yaml
+	APP_NAME=$(HELMFILE_APP_NAME) \
+	SUBDOMAIN=${HELMFILE_APP_NAME} \
+	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
+	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
+	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
+	VERSION=$(BUILD_VERSION) \
+	helmfile -f preview delete
+	kubectl delete --ignore-not-found=true --wait=true --timeout=600s ns ${HELMFILE_APP_NAME}
+	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" preview/helmfile.yaml
+
+chart-values: ## handle chart values like version, tag and respository
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
+	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
+	sed -i "0,/tag:.*/s@tag:.*@tag: $(VERSION)@" charts/$(REPO_NAME)/values.yaml
+	sed -i "0,/repository:.*/s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
+else
+	$(info no charts dir to modify)
+endif
+
 ##@ JX
 
 .PHONY: jx-updatebot
@@ -204,28 +241,6 @@ jx-preview: chart-values ## Create preview environment using jx
 	VERSION=$(BUILD_VERSION) \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	jx preview create
-
-helmfile-preview: chart-values ## Create preview environment using jx
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@echo -e "\nCreating preview environment with helmfile..."
-	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" preview/helmfile.yaml
-	APP_NAME=$(HELMFILE_APP_NAME) \
-	SUBDOMAIN=${HELMFILE_APP_NAME} \
-	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
-	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
-	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
-	VERSION=$(BUILD_VERSION) \
-	helmfile -f preview sync
-
-chart-values: ## handle chart values like version, tag and respository
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
-	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
-	sed -i "0,/tag:.*/s@tag:.*@tag: $(VERSION)@" charts/$(REPO_NAME)/values.yaml
-	sed -i "0,/repository:.*/s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
-else
-	$(info no charts dir to modify)
-endif
 
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)

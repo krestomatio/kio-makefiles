@@ -10,9 +10,9 @@ build-image:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping build-image...)
 
-preview:
+pr-preview:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(info skipping preview...)
+	$(info skipping pr-preview...)
 
 pr:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"

@@ -2,9 +2,9 @@ changelog:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping changelog...)
 
-deploy:
+preview:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(info skipping deploy...)
+	$(info skipping preview...)
 
 release:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
