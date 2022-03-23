@@ -46,6 +46,7 @@ PATH := $(PATH):$(LOCAL_BIN)
 JOB_NAME ?= pr
 PULL_NUMBER ?= 0
 BUILD_ID ?= 0
+PULL_BASE_REF ?= HEAD
 PULL_BASE_SHA ?= HEAD
 PULL_PULL_SHA ?= HEAD
 UPDATEBOT_CONFIG_FILE ?= updatebot.yaml
@@ -80,10 +81,10 @@ SKOPEO_DEST_TLS ?= true
 
 # Release
 GIT_REMOTE ?= origin
-ifneq ($(origin PULL_BASE_REF),undefined)
-GIT_BRANCH ?= $(PULL_BASE_REF)
-else
+ifeq ($(PULL_BASE_REF),HEAD)
 GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
+else
+GIT_BRANCH ?= $(PULL_BASE_REF)
 endif
 GIT_LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
 GIT_ADD_FILES ?= Makefile
