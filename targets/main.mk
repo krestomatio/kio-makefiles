@@ -201,9 +201,16 @@ endif
 jx-preview: chart-values ## Create preview environment using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment..."
+ifeq ($(JOB_NAME),release)
+	BRANCH_NAME=$(GIT_BRANCH) \
 	VERSION=$(BUILD_VERSION) \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	jx preview create
+else
+	VERSION=$(BUILD_VERSION) \
+	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
+	jx preview create
+endif
 
 chart-values: ## handle chart values like version, tag and respository
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
