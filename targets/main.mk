@@ -191,8 +191,8 @@ endif
 .PHONY: jx-changelog
 jx-changelog: ## Generate changelog file using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifneq ($(CHANGELOG_LAST_TAG),)
-	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(CHANGELOG_LAST_TAG) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
+ifneq ($(CHANGELOG_PREV_TAG),)
+	jx changelog create --verbose --version=$(VERSION) --previous-rev=$(CHANGELOG_PREV_TAG) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
 else
 	jx changelog create --verbose --version=$(VERSION) --rev=$(PULL_BASE_SHA) --output-markdown=$(CHANGELOG_FILE) --update-release=false
 endif

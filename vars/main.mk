@@ -89,7 +89,14 @@ GIT_LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
 GIT_ADD_FILES ?= Makefile
 GIT_RELEASE_BRANCH_NUMBER ?= $(shell echo $(GIT_BRANCH) | grep -qE '^release-([0-9]+)\.([0-9]+)$$' && echo $(GIT_BRANCH:release-%=%) || echo)
 CHANGELOG_FILE ?= CHANGELOG.md
-CHANGELOG_LAST_TAG ?= $(GIT_LAST_TAG)
+ifeq ($(GIT_RELEASE_BRANCH_NUMBER),)
+CHANGELOG_PREV_TAG ?= $(GIT_LAST_TAG)
+else
+ifndef GIT_RELEASE_LAST_TAG
+$(error release branch but GIT_RELEASE_LAST_TAG is undefined)
+endif
+CHANGELOG_PREV_TAG ?= $(GIT_RELEASE_LAST_TAG)
+endif
 
 ## VAULT
 export VAULT_ADDR ?= https://vault.jx.krestomat.io
