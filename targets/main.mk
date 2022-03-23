@@ -156,8 +156,12 @@ else
 endif
 	git add $(GIT_ADD_FILES)
 	git commit -m "chore(release): $(VERSION)" -m "[$(SKIP_MSG)]"
+ifeq (0, $(shell git show-ref --tags v$(VERSION) --quiet || echo 0))
 	git tag v$(VERSION)
 	git push $(GIT_REMOTE) $(GIT_BRANCH) --tags
+else
+	git push $(GIT_REMOTE) $(GIT_BRANCH)
+endif
 
 .PHONY: set-manager-image
 set-manager-image: ## Set manager image using kustomize
