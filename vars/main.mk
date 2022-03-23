@@ -87,7 +87,7 @@ GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
 endif
 GIT_LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
 GIT_ADD_FILES ?= Makefile
-GIT_RELEASE_BRANCH_NUMBER ?= $(shell echo $(GIT_BRANCH) | grep -q '^release.[[:digit:]].[[:digit:]]' && echo $(GIT_BRANCH:release-%=%) || echo)
+GIT_RELEASE_BRANCH_NUMBER ?= $(shell echo $(GIT_BRANCH) | grep -qE '^release-([0-9]+)\.([0-9]+)$$' && echo $(GIT_BRANCH:release-%=%) || echo)
 CHANGELOG_FILE ?= CHANGELOG.md
 CHANGELOG_LAST_TAG ?= $(GIT_LAST_TAG)
 
