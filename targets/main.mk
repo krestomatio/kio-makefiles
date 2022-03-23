@@ -144,15 +144,10 @@ endif
 endif
 
 .PHONY: git
-git: ## Git add, commit, tag and push
+git: chart-values ## Git add, commit, tag and push
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
-	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
-	sed -i "0,/tag:.*/s@tag:.*@tag: $(VERSION)@" charts/$(REPO_NAME)/values.yaml
-	sed -i "0,/repository:.*/s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
+ifneq (,$(wildcard charts/))
 	git add charts/
-else
-	$(info no charts)
 endif
 	git add $(GIT_ADD_FILES)
 	git commit -m "chore(release): $(VERSION)" -m "[$(SKIP_MSG)]"
@@ -203,12 +198,22 @@ endif
 	git add $(CHANGELOG_FILE)
 
 .PHONY: jx-preview
-jx-preview: ## Create preview environment using jx
+jx-preview: chart-values ## Create preview environment using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment..."
 	VERSION=$(BUILD_VERSION) \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	jx preview create
+
+chart-values: ## handle chart values like version, tag and respository
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
+	sed -i "s/^version:.*/version: $(VERSION)/" charts/$(REPO_NAME)/Chart.yaml
+	sed -i "0,/tag:.*/s@tag:.*@tag: $(VERSION)@" charts/$(REPO_NAME)/values.yaml
+	sed -i "0,/repository:.*/s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
+else
+	$(info no charts dir to modify)
+endif
 
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)
