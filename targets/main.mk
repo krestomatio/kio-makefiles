@@ -201,16 +201,21 @@ endif
 jx-preview: chart-values ## Create preview environment using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment..."
-ifeq ($(JOB_NAME),release)
-	BRANCH_NAME=$(GIT_BRANCH) \
 	VERSION=$(BUILD_VERSION) \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	jx preview create
-else
-	VERSION=$(BUILD_VERSION) \
+
+helmfile-preview: chart-values ## Create preview environment using jx
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\nCreating preview environment with helmfile..."
+	sed -i "s@- jx-values.yaml@# - jx-values.yaml@" preview/helmfile.yaml
+	APP_NAME=$(HELMFILE_APP_NAME) \
+	SUBDOMAIN=${HELMFILE_APP_NAME} \
+	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
-	jx preview create
-endif
+	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
+	VERSION=$(BUILD_VERSION) \
+	helmfile -f preview sync
 
 chart-values: ## handle chart values like version, tag and respository
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
