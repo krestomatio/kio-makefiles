@@ -202,7 +202,7 @@ else
 endif
 	git add $(CHANGELOG_FILE)
 
-.PHONY: preview
+.PHONY: jx-preview
 jx-preview: ## Create preview environment using jx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment..."

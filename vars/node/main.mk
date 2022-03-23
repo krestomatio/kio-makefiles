@@ -1,3 +1,9 @@
+ifeq ($(JOB_NAME),release)
+BUILD_VERSION ?= $(shell git rev-parse $${PULL_BASE_SHA:-HEAD} 2> /dev/null  || echo)
+else
+BUILD_VERSION ?= $(shell git rev-parse $${PULL_PULL_SHA:-HEAD} 2> /dev/null  || echo)
+endif
+
 ## npx commitlint
 ifeq ($(PULL_BASE_SHA),HEAD)
 COMMITLINT_FROM ?= HEAD~1
