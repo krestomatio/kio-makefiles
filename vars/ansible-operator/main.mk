@@ -1,7 +1,9 @@
 # molecule
 MOLECULE_SEQUENCE ?= test
 MOLECULE_SCENARIO ?= default
-ifeq ($(PULL_NUMBER),0)
+ifeq ($(PULL_NUMBER),)
+TEST_SUBINDEX := 0
+else ifeq ($(PULL_NUMBER),0)
 TEST_SUBINDEX := 0
 else
 TEST_SUBINDEX := $(shell date +%s | tail -c 3)
