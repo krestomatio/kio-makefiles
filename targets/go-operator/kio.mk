@@ -18,10 +18,9 @@ testing-deploy-prepare:
 	cd config/testing/nfs; \
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
 	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
-	cd config/testing/rook-nfs/operator; \
-	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}
-	cd config/testing/rook-nfs/server; \
-	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}
+	cd config/testing/postgres; \
+	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
+	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
 
 testing-deploy-apply-safe:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -29,8 +28,7 @@ testing-deploy-apply-safe:
 
 testing-deploy-apply:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/testing/rook-nfs/operator | kubectl apply -f -
-	kustomize build config/testing/rook-nfs/server | kubectl apply -f -
+	kustomize build config/testing/postgres | kubectl apply -f -
 	kustomize build config/testing/nfs | kubectl apply -f -
 	kustomize build config/testing/keydb | kubectl apply -f -
 	kustomize build config/testing/m4e | kubectl apply -f -
@@ -61,8 +59,7 @@ testing-undeploy-delete:
 	kustomize build config/testing/m4e | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/keydb | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/nfs | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/rook-nfs/server | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/rook-nfs/operator | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/postgres | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	# in case sc remains
 	kubectl delete --ignore-not-found=true sc site-site-sample-nfs-sc || echo
 
@@ -81,10 +78,9 @@ testing-undeploy-restore:
 	cd config/testing/nfs; \
 	kustomize edit set namespace kio-test; \
 	kustomize edit set nameprefix kio-
-	cd config/testing/rook-nfs/operator; \
-	kustomize edit set namespace kio-test
-	cd config/testing/rook-nfs/server; \
-	kustomize edit set namespace kio-test
+	cd config/testing/postgres; \
+	kustomize edit set namespace kio-test; \
+	kustomize edit set nameprefix kio-
 
 ##@ Dependant operators
 
