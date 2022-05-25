@@ -4,10 +4,10 @@ KIND_CLUSTER_NAME ?= kio-operator
 KIND_NAMESPACE ?= m4e-operator-system
 
 .PHONY: local-install
-local-install: kustomize kubectl kind-create kind-context deploy-operators install
+local-install: kustomize kubectl kind-create kind-context deploy-csi-nfs deploy-operators install
 
 .PHONY: local-uninstall
-local-uninstall: uninstall undeploy-operators
+local-uninstall: uninstall undeploy-operators undeploy-csi-nfs
 
 .PHONY: local-purge
 local-purge: kind-delete

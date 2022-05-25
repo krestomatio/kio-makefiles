@@ -153,6 +153,23 @@ kind-unpause: ## Unpause kind cluster container
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
 
+.PHONY: deploy-csi-nfs
+deploy-csi-nfs: ## Deploy CSI NFS to the K8s cluster specified in ~/.kube/config.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info installing CSI NFS)
+	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
+	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
+	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml
+	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml
+
+.PHONY: undeploy-csi-nfs
+undeploy-csi-nfs: ## Undeploy CSI NFS from the K8s cluster specified in ~/.kube/config.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
+	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
+	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml
+	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml
+
 .PHONY: vault
 VAULT = $(LOCAL_BIN)/vault
 vault: ## Download vault CLI locally if necessary.

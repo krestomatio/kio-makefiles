@@ -101,6 +101,10 @@ CHANGELOG_PREV_TAG ?= $(GIT_RELEASE_LAST_TAG)
 HELMFILE_APP_NAME ?= $(REPO_NAME).$(GIT_RELEASE_BRANCH_NUMBER)
 endif
 
+# CSI NFS
+CSI_NFS_VERSION ?= 4.0.0
+CSI_NFS_BASE_URL_INSTALL ?= https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v$(CSI_NFS_VERSION)/deploy
+
 ## VAULT
 export VAULT_ADDR ?= https://vault.jx.krestomat.io
 VAULT_VERSION ?= 1.9.3

@@ -20,7 +20,3 @@ export COLLECTION_FILE ?= krestomatio-k8s-$(COLLECTION_VERSION).tar.gz
 
 # Release
 GIT_ADD_FILES ?= Makefile config/manager/kustomization.yaml
-
-# NFS
-CSI_NFS_VERSION ?= 4.0.0
-CSI_NFS_BASE_URL_INSTALL ?= https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v$(CSI_NFS_VERSION)/deploy
