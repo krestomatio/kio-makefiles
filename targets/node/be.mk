@@ -11,7 +11,7 @@ else
 KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig__$(KIO_WEB_APP_ENV)__kio-web-app
 endif
 
-install: kustomize skaffold kubectl kind kind-create kind-context kubeconfig-download-if dot-env-download-if
+install: kustomize skaffold kubectl kind-create kind-context kubeconfig-download-if dot-env-download-if
 
 deploy: ## Deploy to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -20,28 +20,6 @@ deploy: ## Deploy to the K8s cluster specified in ~/.kube/config.
 undeploy: ## Undeploy  from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV) | kubectl delete --ignore-not-found=true -f -
-
-kind-create: ## Create kind clusters
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KIND) get clusters 2>/dev/null | grep -q $(KIND_CLUSTER_NAME) || \
-	{ $(KIND) create cluster --name $(KIND_CLUSTER_NAME) --image=kindest/node:v$(KIND_IMAGE_VERSION); }
-
-kind-delete: ## Delete kind clusters
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KIND) delete cluster --name $(KIND_CLUSTER_NAME)
-
-kind-context: ## Use kind cluster by setting its context
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KUBECTL) config use-context kind-$(KIND_CLUSTER_NAME)
-	$(KUBECTL) config set-context --current --namespace=$(KIND_NAMESPACE)
-
-kind-pause: ## Pause kind cluster container
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker pause
-
-kind-unpause: ## Unpause kind cluster container
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
 
 local-deploy-base: kubeconfig-download-if ## Deploy base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"

@@ -1,5 +1,17 @@
 ##@ Testing deploy
 
+KIND_CLUSTER_NAME ?= kio-operator
+KIND_NAMESPACE ?= m4e-operator-system
+
+.PHONY: local-install
+local-install: kustomize kubectl kind-create kind-context deploy-operators install
+
+.PHONY: local-uninstall
+local-uninstall: uninstall undeploy-operators
+
+.PHONY: local-purge
+local-purge: kind-delete
+
 testing-deploy: testing-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
 
 testing-deploy-prepare: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)

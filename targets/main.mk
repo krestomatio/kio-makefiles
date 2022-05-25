@@ -126,6 +126,33 @@ KIND = $(shell which kind)
 endif
 endif
 
+.PHONY: kind-create
+kind-create: kind ## Create kind clusters
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@$(KIND) get clusters 2>/dev/null | grep -q $(KIND_CLUSTER_NAME) || \
+	{ $(KIND) create cluster --name $(KIND_CLUSTER_NAME) --image=kindest/node:v$(KIND_IMAGE_VERSION); }
+
+.PHONY: kind-delete
+kind-delete: ## Delete kind clusters
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(KIND) delete cluster --name $(KIND_CLUSTER_NAME)
+
+.PHONY: kind-context
+kind-context: ## Use kind cluster by setting its context
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(KUBECTL) config use-context kind-$(KIND_CLUSTER_NAME)
+	$(KUBECTL) config set-context --current --namespace=$(KIND_NAMESPACE)
+
+.PHONY: kind-pause
+kind-pause: ## Pause kind cluster container
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker pause
+
+.PHONY: kind-unpause
+kind-unpause: ## Unpause kind cluster container
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
+
 .PHONY: vault
 VAULT = $(LOCAL_BIN)/vault
 vault: ## Download vault CLI locally if necessary.
