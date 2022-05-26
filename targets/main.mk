@@ -159,8 +159,8 @@ deploy-csi-nfs: ## Deploy CSI NFS to the K8s cluster specified in ~/.kube/config
 	$(info installing CSI NFS)
 	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
 	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
-	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml
-	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml
+	kubectl patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
+	kubectl patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
 
 .PHONY: undeploy-csi-nfs
 undeploy-csi-nfs: ## Undeploy CSI NFS from the K8s cluster specified in ~/.kube/config.
