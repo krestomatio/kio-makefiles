@@ -1,7 +1,7 @@
 ##@ Testing deploy
 
 KIND_CLUSTER_NAME ?= kio-operator
-KIND_NAMESPACE ?= m4e-operator-system
+KIND_NAMESPACE ?= site-sample
 
 .PHONY: local-install
 local-install: kustomize kubectl kind-create kind-context deploy-csi-nfs deploy-operators install ## Install a local dev env
