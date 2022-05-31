@@ -6,6 +6,7 @@ include $(MK_TARGETS_PROJECT_TYPE_FILE)
 endif
 
 ifneq ($(PROJECT_TYPE),go-operator)
+.PHONY: help
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
@@ -15,7 +16,7 @@ kustomize: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUSTOMIZE)))
 ifeq (,$(shell which kustomize 2>/dev/null))
-	$(info Downloading kustomize to $(KUSTOMIZE))
+	@echo -e "${YELLOW}++ Downloading kustomize to $(KUSTOMIZE)${RESET}"
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KUSTOMIZE)) ;\
@@ -30,16 +31,19 @@ endif
 
 ##@ Common
 
+
+.PHONY: start-dockerd
 start-dockerd: ## Start docker daemon in background (if not running) (meant to be run in container)
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(shell pidof dockerd))
-	$(info starting dockerd in the backgroud...)
+	@echo -e "${YELLOW}++ starting dockerd in the backgroud...${RESET}"
 	dockerd-entrypoint.sh &> /tmp/dockerd.log &
 	@sleep 4
 else
-	$(info dockerd already running...)
+	@echo -e "${YELLOW}++ dockerd already running...${RESET}"
 endif
 
+.PHONY: image-build
 image-build: ## Build container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
@@ -49,10 +53,12 @@ else
 	$(CONTAINER_BUILDER) build . -t $(IMG)
 endif
 
+.PHONY: image-push
 image-push: ## Push container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(CONTAINER_BUILDER) push $(IMG)
 
+.PHONY: buildah-build
 buildah-build: ## Build the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
@@ -62,13 +68,16 @@ else
 	buildah --storage-driver vfs bud -t $(IMG) .
 endif
 
+.PHONY: buildah-push
 buildah-push: ## Push the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	buildah --storage-driver vfs push $(IMG)
 
+.PHONY: testing-image
 testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-image: image-build image-push ## Build and push testing image
 
+.PHONY: testing-buildah-image
 testing-buildah-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-buildah-image: buildah-build buildah-push ## Build and push testing image using buildah
 
@@ -78,7 +87,7 @@ skaffold: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(SKAFFOLD)))
 ifeq (,$(shell which skaffold 2>/dev/null))
-	$(info Downloading skaffold to $(SKAFFOLD))
+	@echo -e "${YELLOW}++ Downloading skaffold to $(SKAFFOLD)${RESET}"
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(SKAFFOLD)) ;\
@@ -96,7 +105,7 @@ kubectl: ## Download kubectl locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUBECTL)))
 ifeq (,$(shell which kubectl 2>/dev/null))
-	$(info Downloading kubectl to $(KUBECTL))
+	@echo -e "${YELLOW}++ Downloading kubectl to $(KUBECTL)${RESET}"
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KUBECTL)) ;\
@@ -108,13 +117,31 @@ KUBECTL = $(shell which kubectl)
 endif
 endif
 
+.PHONY: konfig
+KONFIG = $(LOCAL_BIN)/konfig
+konfig: ## Download konfig locally if necessary.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(KONFIG)))
+ifeq (,$(shell which konfig 2>/dev/null))
+	@echo -e "${YELLOW}++ Downloading konfig to $(KONFIG)${RESET}"
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(KONFIG)) ;\
+	curl -sSL https://github.com/corneliusweig/konfig/raw/v$(KONFIG_VERSION)/konfig -o $(KONFIG) ;\
+	chmod +x $(KONFIG) ;\
+	}
+else
+KONFIG = $(shell which konfig)
+endif
+endif
+
 .PHONY: kind
 KIND = $(LOCAL_BIN)/kind
 kind: ## Download kind locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KIND)))
 ifeq (,$(shell which kind 2>/dev/null))
-	$(info Downloading kind to $(KIND))
+	@echo -e "${YELLOW}++ Downloading kind to $(KIND)${RESET}"
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KIND)) ;\
@@ -135,40 +162,50 @@ kind-create: kind ## Create kind clusters
 .PHONY: kind-delete
 kind-delete: ## Delete kind clusters
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KIND) delete cluster --name $(KIND_CLUSTER_NAME)
+	@$(KIND) delete cluster --name $(KIND_CLUSTER_NAME)
 
 .PHONY: kind-context
 kind-context: ## Use kind cluster by setting its context
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KUBECTL) config use-context kind-$(KIND_CLUSTER_NAME)
-	$(KUBECTL) config set-context --current --namespace=$(KIND_NAMESPACE)
+	@$(KUBECTL) config use-context kind-$(KIND_CLUSTER_NAME)
+	@$(KUBECTL) config set-context --current --namespace=$(KIND_NAMESPACE)
+
+.PHONY: kind-start
+kind-start: ## Start kind cluster container
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker start
+
+.PHONY: kind-stop
+kind-stop: ## Stop kind cluster container
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker stop
 
 .PHONY: kind-pause
 kind-pause: ## Pause kind cluster container
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker pause
+	@$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker pause
 
 .PHONY: kind-unpause
 kind-unpause: ## Unpause kind cluster container
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
+	@$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
 
 .PHONY: deploy-csi-nfs
 deploy-csi-nfs: ## Deploy CSI NFS to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(info installing CSI NFS)
-	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
-	kubectl apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
-	kubectl patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
-	kubectl patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
+	@echo -e "${YELLOW}++ installing CSI NFS${RESET}"
+	@$(KUBECTL) apply -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
+	@$(KUBECTL) apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
+	@$(KUBECTL) patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
+	@$(KUBECTL) patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
 
 .PHONY: undeploy-csi-nfs
 undeploy-csi-nfs: ## Undeploy CSI NFS from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
-	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
-	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml
-	kubectl delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml
+	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
+	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
+	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml
+	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml
 
 .PHONY: vault
 VAULT = $(LOCAL_BIN)/vault
@@ -176,7 +213,7 @@ vault: ## Download vault CLI locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(VAULT)))
 ifeq (,$(shell which vault 2>/dev/null))
-	$(info Downloading vault to $(VAULT))
+	@echo -e "${YELLOW}++ Downloading vault to $(VAULT)${RESET}"
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(VAULT)) ;\
@@ -219,6 +256,7 @@ skopeo-copy: ## Copy images using skopeo
 	# major
 	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION) docker://$(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION)))
 
+.PHONY: helmfile-preview
 helmfile-preview: chart-values ## Create preview environment using helmfile
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment with helmfile..."
@@ -232,6 +270,7 @@ helmfile-preview: chart-values ## Create preview environment using helmfile
 	helmfile -f preview sync
 	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" preview/helmfile.yaml
 
+.PHONY: helmfile-preview-destroy
 helmfile-preview-destroy: ## Destroy preview environment using helmfile
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\Destroying preview environment with helmfile..."
@@ -246,6 +285,7 @@ helmfile-preview-destroy: ## Destroy preview environment using helmfile
 	kubectl delete --ignore-not-found=true --wait=true --timeout=600s ns ${HELMFILE_APP_NAME}
 	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" preview/helmfile.yaml
 
+.PHONY: chart-values
 chart-values: ## handle chart values like version, tag and respository
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
@@ -253,10 +293,11 @@ ifeq (0, $(shell test -d  "charts/$(REPO_NAME)"; echo $$?))
 	sed -i "0,/tag:.*/s@tag:.*@tag: $(VERSION)@" charts/$(REPO_NAME)/values.yaml
 	sed -i "0,/repository:.*/s@repository:.*@repository: $(IMAGE_TAG_BASE)@" charts/$(REPO_NAME)/values.yaml
 else
-	$(info no charts dir to modify)
+	@echo -e "${YELLOW}++ no charts dir to modify${RESET}"
 endif
 
 ##@ JX
+
 
 .PHONY: jx-updatebot
 jx-updatebot: ## Create PRs in downstream repos with new version using jx

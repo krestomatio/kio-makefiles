@@ -16,7 +16,7 @@ galaxy-publish: ## Publish galaxy collection
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(GALAXY_COLLECTION_PUBLISHED),false)
 	ansible-galaxy collection build --force
-	$(info ansible-galaxy collection publish krestomatio-k8s-$(VERSION).tar.gz)
+	@echo -e "${YELLOW}++ ansible-galaxy collection publish krestomatio-k8s-$(VERSION).tar.gz${RESET}"
 	@ansible-galaxy collection publish krestomatio-k8s-$(VERSION).tar.gz --api-key $(ANSIBLE_GALAXY_TOKEN)
 else
 	@echo -e "not publisging $(GALAXY_COLLECTION_FILE), it already already is"
