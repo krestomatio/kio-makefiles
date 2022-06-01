@@ -226,6 +226,13 @@ VAULT = $(shell which vault)
 endif
 endif
 
+.PHONY: vault-login
+vault-login: VAULT_LOGIN_METHOD = oidc
+vault-login: vault ## Login with Vault using method set by 'VAULT_LOGIN_METHOD'. Default is oidc
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
+	@$(VAULT) login -method=$(VAULT_LOGIN_METHOD)
+
 .PHONY: git
 git: chart-values ## Git add, commit, tag and push
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
