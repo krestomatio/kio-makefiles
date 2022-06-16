@@ -13,10 +13,9 @@ local-uninstall: uninstall undeploy-operators undeploy-csi-nfs ## Uninstall the 
 local-purge: kind-delete ## Purge the local dev env
 
 .PHONY: testing-deploy
-testing-deploy: testing-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
+testing-deploy: buildx-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
 
 .PHONY: testing-deploy-prepare
-testing-deploy-prepare: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 testing-deploy-prepare: ## Test deployment preparation
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/testing; \

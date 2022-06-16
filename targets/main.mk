@@ -5,6 +5,12 @@ ifneq (,$(wildcard $(MK_TARGETS_PROJECT_TYPE_FILE)))
 include $(MK_TARGETS_PROJECT_TYPE_FILE)
 endif
 
+## General functions
+define github_latest_release_version
+$$(basename $$(curl -fs -o/dev/null -w %{redirect_url} '$(1)/releases/latest') | sed 's/^v//')
+endef
+
+## General targets
 ifneq ($(PROJECT_TYPE),go-operator)
 .PHONY: help
 help: ## Display this help.
@@ -73,13 +79,15 @@ buildah-push: ## Push the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	buildah --storage-driver vfs push $(IMG)
 
-.PHONY: testing-image
-testing-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
-testing-image: image-build image-push ## Build and push testing image
-
-.PHONY: testing-buildah-image
-testing-buildah-image: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
-testing-buildah-image: buildah-build buildah-push ## Build and push testing image using buildah
+.PHONY: buildx-image
+buildx-image: buildx ## Build container image with docker buildx
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq ($(PROJECT_TYPE),ansible-operator)
+	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(IMG) \
+		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
+else
+	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(IMG)
+endif
 
 .PHONY: skaffold
 SKAFFOLD = $(LOCAL_BIN)/skaffold
@@ -150,6 +158,25 @@ ifeq (,$(shell which kind 2>/dev/null))
 	}
 else
 KIND = $(shell which kind)
+endif
+endif
+
+.PHONY: buildx
+BUILDX =  $(HOME)/.docker/cli-plugins/docker-buildx
+buildx: buildx_version = $(call github_latest_release_version,https://github.com/docker/buildx)
+buildx: ## Download buildx locally if necessary.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(BUILDX)))
+ifeq (,$(shell which buildx 2>/dev/null))
+	$(info Downloading buildx to $(BUILDX))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(BUILDX)) ;\
+	curl -sSL "https://github.com/docker/buildx/releases/download/v$(buildx_version)/buildx-v$(buildx_version).$(OS)-$(ARCH)" -o $(BUILDX) ;\
+	chmod +x $(BUILDX) ;\
+	}
+else
+BUILDX = $(shell which buildx)
 endif
 endif
 

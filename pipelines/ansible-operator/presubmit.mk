@@ -6,5 +6,4 @@ lint: molecule ## Run linting tasks
 k8s: pr ## Run k8s tasks
 
 .PHONY: pr
-pr: IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
-pr: collection-build testing-image molecule ## Run pr tasks
+pr: collection-build buildx-image molecule ## Run pr tasks
