@@ -363,6 +363,12 @@ jx-preview: chart-values ## Create preview environment using jx
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	jx preview create
 
+.PHONY: buildx-k8s-multiarch
+buildx-k8s-multiarch: ## Create buildx k8s multiarch instance builder
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	docker buildx create --use --bootstrap --append --name=multiarch-builder --platform=linux/amd64 --node=multiarch-builder-amd64-k8s --driver=kubernetes --driver-opt="qemu.install=true,namespace=jx,requests.cpu=100m,requests.memory=500Mi" multiarch-builder-amd64-k8s
+	docker buildx create --bootstrap --append --name=multiarch-builder --platform=linux/arm64 --node=multiarch-builder-arm64-k8s --driver=kubernetes --driver-opt="qemu.install=true,namespace=jx,requests.cpu=100m,requests.memory=500Mi" multiarch-builder-arm64-k8s
+
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)
 endif

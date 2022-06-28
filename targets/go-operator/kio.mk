@@ -13,7 +13,7 @@ local-uninstall: uninstall undeploy-operators undeploy-csi-nfs ## Uninstall the 
 local-purge: kind-delete ## Purge the local dev env
 
 .PHONY: testing-deploy
-testing-deploy: buildx-image testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
+testing-deploy: testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
 
 .PHONY: testing-deploy-prepare
 testing-deploy-prepare: ## Test deployment preparation
