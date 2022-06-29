@@ -41,13 +41,11 @@ endif
 .PHONY: start-dockerd
 start-dockerd: ## Start docker daemon in background (if not running) (meant to be run in container)
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (,$(shell pidof dockerd))
-	@echo -e "${YELLOW}++ starting dockerd in the backgroud...${RESET}"
-	dockerd-entrypoint.sh &> /tmp/dockerd.log &
-	@sleep 4
-else
-	@echo -e "${YELLOW}++ dockerd already running...${RESET}"
-endif
+	@pidof -q dockerd1 && echo -e "${YELLOW}++ dockerd already running...${RESET}" || \
+		{ echo -e "${YELLOW}++ starting dockerd in the backgroud...${RESET}"; \
+		  dockerd-entrypoint.sh &> /tmp/dockerd.log; sleep 4; \
+		}
+
 
 .PHONY: image-build
 image-build: ## Build container image with the manager.
