@@ -42,7 +42,7 @@ G12E_VERSION ?= 2.0.9
 
 # OS
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
-ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
+ARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
 CWD := $(shell pwd)
 LOCAL_BIN ?= ./bin
 PATH := $(PATH):$(LOCAL_BIN)
