@@ -65,7 +65,7 @@ BUILD_VERSION ?= $(shell git rev-parse $${PULL_BASE_SHA:-HEAD}^2 2>\&1 >/dev/nul
 else
 BUILD_VERSION ?= $(shell git rev-parse $${PULL_PULL_SHA:-HEAD} 2> /dev/null  || echo)
 endif
-BUILD_IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
+BUILD_IMG ?= $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 
 # CI
 SKIP_MSG := skip.ci
