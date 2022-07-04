@@ -109,7 +109,7 @@ testing-undeploy-restore: ## Test undeployment restore files
 .PHONY: deploy-operators
 deploy-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	cd config/manager && kustomize edit set image controller=${IMG}
+	cd config/manager && kustomize edit set image controller=$(BUILD_IMG)
 	kustomize build config/operators | kubectl apply -f -
 
 .PHONY: undeploy-operators

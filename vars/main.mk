@@ -11,7 +11,7 @@ VERSION ?= 0.0.1
 OPERATOR_SHORTNAME ?= $(PROJECT_SHORTNAME)
 OPERATOR_NAME ?= $(OPERATOR_SHORTNAME)-operator
 OPERATOR_TYPE ?= ansible
-export OPERATOR_IMAGE ?= $(IMG)
+export OPERATOR_IMAGE ?= $(BUILD_IMG)
 
 # Repo
 REPO_NAME ?= $(OPERATOR_NAME)
@@ -22,11 +22,9 @@ REGISTRY ?= quay.io
 REGISTRY_PATH ?= $(REGISTRY)/$(REPO_OWNER)
 REGISTRY_PROJECT_NAME ?= $(REPO_NAME)
 IMAGE_TAG_BASE ?= $(REGISTRY_PATH)/$(REGISTRY_PROJECT_NAME)
-ifeq ($(JOB_NAME),release)
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
-else
-IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
-endif
+IMG_MINOR ?= $(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION))).$(word 2,$(subst ., ,$(VERSION)))
+IMG_MAJOR ?= $(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION)))
 
 # requirements
 CONTAINER_BUILDER ?= docker
@@ -67,6 +65,7 @@ BUILD_VERSION ?= $(shell git rev-parse $${PULL_BASE_SHA:-HEAD}^2 2>\&1 >/dev/nul
 else
 BUILD_VERSION ?= $(shell git rev-parse $${PULL_PULL_SHA:-HEAD} 2> /dev/null  || echo)
 endif
+BUILD_IMG = $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 
 # CI
 SKIP_MSG := skip.ci

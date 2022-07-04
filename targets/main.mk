@@ -51,40 +51,40 @@ start-dockerd: ## Start docker daemon in background (if not running) (meant to b
 image-build: ## Build container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
-	$(CONTAINER_BUILDER) build . -t $(IMG) \
+	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
 else
-	$(CONTAINER_BUILDER) build . -t $(IMG)
+	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG)
 endif
 
 .PHONY: image-push
 image-push: ## Push container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(CONTAINER_BUILDER) push $(IMG)
+	$(CONTAINER_BUILDER) push $(BUILD_IMG)
 
 .PHONY: buildah-build
 buildah-build: ## Build the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
-	buildah --storage-driver vfs bud -t $(IMG) . \
+	buildah --storage-driver vfs bud -t $(BUILD_IMG) . \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
 else
-	buildah --storage-driver vfs bud -t $(IMG) .
+	buildah --storage-driver vfs bud -t $(BUILD_IMG) .
 endif
 
 .PHONY: buildah-push
 buildah-push: ## Push the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	buildah --storage-driver vfs push $(IMG)
+	buildah --storage-driver vfs push $(BUILD_IMG)
 
 .PHONY: buildx-image
 buildx-image: buildx ## Build container image with docker buildx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
-	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(IMG) \
+	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
 else
-	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(IMG)
+	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG)
 endif
 
 .PHONY: skaffold
@@ -276,17 +276,17 @@ endif
 .PHONY: set-manager-image
 set-manager-image: ## Set manager image using kustomize
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	cd config/manager && kustomize edit set image controller=$(IMAGE_TAG_BASE):$(VERSION)
+	cd config/manager && kustomize edit set image controller=$(IMG)
 
 .PHONY: skopeo-copy
 skopeo-copy: ## Copy images using skopeo
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	# full version
-	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION) docker://$(IMAGE_TAG_BASE):$(VERSION)
+	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG)
 	# major + minor
-	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION) docker://$(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION))).$(word 2,$(subst ., ,$(VERSION)))
+	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG_MINOR)
 	# major
-	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION) docker://$(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION)))
+	skopeo copy --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG_MAJOR)
 
 .PHONY: helmfile-preview
 helmfile-preview: chart-values ## Create preview environment using helmfile
