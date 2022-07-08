@@ -123,7 +123,7 @@ kind-create-site-clusters: konfig kind ## Create/Start kind clusters for sites
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ empty kubeconfig: $(KIO_WEB_APP_KUBECONFIG_NAME)${RESET}"
 	@for cluster in $(KIND_SITE_CLUSTER_NAMES); do \
-		$(MAKE) kind-create kind-start kind-context deploy-csi-nfs deploy-kio-operators image-pull-secret operator-env-secret api-endpoint-dns KIND_CLUSTER_NAME=$${cluster} KIND_NAMESPACE=kio-operator-system || { $(KUBECTL) config use-context $(KUBE_CURRENT_CONTEXT); exit 2; }; \
+		$(MAKE) kind-create kind-start kind-context deploy-csi-driver-nfs deploy-kio-operators image-pull-secret operator-env-secret api-endpoint-dns KIND_CLUSTER_NAME=$${cluster} KIND_NAMESPACE=kio-operator-system || { $(KUBECTL) config use-context $(KUBE_CURRENT_CONTEXT); exit 2; }; \
 	done
 	@$(MAKE) kubeconfig-local
 	@echo -e "${YELLOW}++ setting kubeconfig original context${RESET}"

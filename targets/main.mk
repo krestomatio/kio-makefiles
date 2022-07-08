@@ -215,22 +215,16 @@ kind-unpause: ## Unpause kind cluster container
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(KIND) get nodes --name $(KIND_CLUSTER_NAME) | xargs docker unpause
 
-.PHONY: deploy-csi-nfs
-deploy-csi-nfs: ## Deploy CSI NFS to the K8s cluster specified in ~/.kube/config.
+.PHONY: deploy-csi-driver-nfs
+deploy-csi-driver-nfs: ## Deploy CSI NFS to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ installing CSI NFS${RESET}"
-	@$(KUBECTL) apply -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
-	@$(KUBECTL) apply -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
-	@$(KUBECTL) patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
-	@$(KUBECTL) patch --dry-run=client -o json -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml -p '{"spec":{"template":{"spec":{"dnsPolicy":"ClusterFirstWithHostNet"}}}}' | kubectl apply -f -
+	@$(KUSTOMIZE) build $(CSI_NFS_BASE_URL_INSTALL) | $(KUBECTL) apply -f -
 
-.PHONY: undeploy-csi-nfs
-undeploy-csi-nfs: ## Undeploy CSI NFS from the K8s cluster specified in ~/.kube/config.
+.PHONY: undeploy-csi-driver-nfs
+undeploy-csi-driver-nfs: ## Undeploy CSI NFS from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/rbac-csi-nfs-controller.yaml
-	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-driverinfo.yaml
-	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-controller.yaml
-	@$(KUBECTL) delete --ignore-not-found=true -f $(CSI_NFS_BASE_URL_INSTALL)/csi-nfs-node.yaml
+	@$(KUSTOMIZE) build $(CSI_NFS_BASE_URL_INSTALL) | $(KUBECTL) delete -f -
 
 .PHONY: vault
 VAULT = $(LOCAL_BIN)/vault

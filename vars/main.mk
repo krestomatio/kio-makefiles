@@ -119,8 +119,11 @@ export TEST_OPERATOR_OMIT_KIND_DELETION_LIST ?= CustomResourceDefinition
 export TEST_OPERATOR_SHORTNAME ?= $(OPERATOR_SHORTNAME)
 
 # CSI NFS
-CSI_NFS_VERSION ?= 4.0.0
-CSI_NFS_BASE_URL_INSTALL ?= https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v$(CSI_NFS_VERSION)/deploy
+ifeq ($(PROJECT_SHORTNAME),nfs)
+CSI_NFS_BASE_URL_INSTALL ?= config/csi-driver-nfs
+else
+CSI_NFS_BASE_URL_INSTALL ?= github.com/krestomatio/nfs-operator/config/csi-driver-nfs?ref=master
+endif
 
 ## VAULT
 export VAULT_ADDR ?= https://vault.jx.krestomat.io
