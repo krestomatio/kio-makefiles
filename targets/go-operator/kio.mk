@@ -4,10 +4,10 @@ KIND_CLUSTER_NAME ?= kio-operator
 KIND_NAMESPACE ?= site-sample
 
 .PHONY: local-install
-local-install: kustomize kubectl kind-create kind-context deploy-csi-driver-nfs deploy-operators install ## Install a local dev env
+local-install: kustomize kubectl kind-create kind-context deploy-operators install ## Install a local dev env
 
 .PHONY: local-uninstall
-local-uninstall: uninstall undeploy-operators undeploy-csi-driver-nfs ## Uninstall the local dev env
+local-uninstall: uninstall undeploy-operators ## Uninstall the local dev env
 
 .PHONY: local-purge
 local-purge: kind-delete ## Purge the local dev env
