@@ -8,9 +8,9 @@ KIND_SITE_CLUSTER_NAMES ?= e87ef9fe-3886-586e-8091-da1b4512c2e8 aadb72d7-520f-57
 KUBE_CURRENT_CONTEXT = $(shell $(KUBECTL) config current-context)
 KIO_WEB_APP_ENV ?= local
 ifeq ($(KIO_WEB_APP_ENV),local)
-KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig.dev.kio-web-app
+KIO_WEB_APP_KUBECONFIG_NAME ?= dev-kubeconfig-kio-web-app
 else
-KIO_WEB_APP_KUBECONFIG_NAME ?= kubeconfig.$(KIO_WEB_APP_ENV).kio-web-app
+KIO_WEB_APP_KUBECONFIG_NAME ?= $(KIO_WEB_APP_ENV)-kubeconfig-kio-web-app
 endif
 
 .PHONY: install
