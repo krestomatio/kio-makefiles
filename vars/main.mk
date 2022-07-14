@@ -61,9 +61,10 @@ BUILD_REGISTRY_PATH ?= $(BUILD_REGISTRY)/krestomatio
 BUILD_REGISTRY_PROJECT_NAME ?= $(REGISTRY_PROJECT_NAME)
 BUILD_IMAGE_TAG_BASE ?= $(BUILD_REGISTRY_PATH)/$(BUILD_REGISTRY_PROJECT_NAME)
 ifeq ($(JOB_NAME),release)
-BUILD_VERSION ?= $(shell git rev-parse $${PULL_BASE_SHA:-HEAD}^2 2>\&1 >/dev/null && git rev-parse $${PULL_BASE_SHA:-HEAD}^2 || echo)
+## if release job, try to get merge commit, otherwise use HEAD
+BUILD_VERSION ?= $(shell git rev-parse $${PULL_BASE_SHA:-HEAD}^2 2>/dev/null 1>/dev/null && git rev-parse $${PULL_BASE_SHA:-HEAD}^2 || { git rev-parse HEAD 2>/dev/null || echo build; })
 else
-BUILD_VERSION ?= $(shell git rev-parse $${PULL_PULL_SHA:-HEAD} 2> /dev/null  || echo)
+BUILD_VERSION ?= $(shell git rev-parse $${PULL_PULL_SHA:-HEAD} 2>/dev/null || echo build)
 endif
 BUILD_IMG ?= $(BUILD_IMAGE_TAG_BASE):$(BUILD_VERSION)
 
@@ -90,7 +91,7 @@ GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
 else
 GIT_BRANCH ?= $(PULL_BASE_REF)
 endif
-GIT_LAST_TAG ?= $(shell git describe --tags --abbrev=0 2> /dev/null || echo)
+GIT_LAST_TAG ?= $(shell git describe --tags --abbrev=0 2>/dev/null || echo)
 GIT_ADD_FILES ?= Makefile
 GIT_RELEASE_BRANCH_NUMBER ?= $(shell echo $(GIT_BRANCH) | grep -qE '^release-([0-9]+)\.([0-9]+)$$' && echo $(GIT_BRANCH:release-%=%) || echo)
 CHANGELOG_FILE ?= CHANGELOG.md
