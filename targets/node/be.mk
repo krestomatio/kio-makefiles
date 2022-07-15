@@ -50,6 +50,7 @@ local-deploy-db: local-deploy-base ## Deploy db manifests for local env
 .PHONY: local-undeploy-base
 local-undeploy-base: local-undeploy-db ## Delete base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@touch $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | $(KUBECTL) delete --ignore-not-found=true -f -
 
 .PHONY: local-undeploy-db
