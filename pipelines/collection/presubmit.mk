@@ -1,2 +1,2 @@
 .PHONY: sanity
-sanity: ansible-lint start-dockerd test-sanity ## Run sanity tests
+sanity: start-dockerd ansible-lint test-sanity ## Run sanity tests
