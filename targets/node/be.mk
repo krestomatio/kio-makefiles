@@ -6,39 +6,34 @@ KIND_CLUSTER_NAME ?= kio-web-app
 KIND_NAMESPACE ?= local-kio-web-app-system
 KIND_SITE_CLUSTER_NAMES ?= e87ef9fe-3886-586e-8091-da1b4512c2e8 aadb72d7-520f-57a0-9437-126265951892
 KUBE_CURRENT_CONTEXT = $(shell $(KUBECTL) config current-context)
-KIO_WEB_APP_ENV ?= local
-ifeq ($(KIO_WEB_APP_ENV),local)
 KIO_WEB_APP_KUBECONFIG_NAME ?= dev-kubeconfig-kio-web-app
-else
-KIO_WEB_APP_KUBECONFIG_NAME ?= $(KIO_WEB_APP_ENV)-kubeconfig-kio-web-app
-endif
 
 .PHONY: install
-install: kustomize skaffold kubectl kind-create kind-start kind-context dot-env-download-if ## install the local environment
+install: kustomize skaffold kubectl dot-env-download-if ## install the environment
 
 .PHONY: install-remote-sites
-install-remote-sites: kubectl kubeconfig-remote install ## install the local environment using remote cluster for sites
+install-remote-sites: install kubeconfig-remote ## install the local environment using remote cluster for sites
 
 .PHONY: install-local-sites
-install-local-sites: kubectl kind-create-site-clusters install ## install the local environment along with two local cluster for sites
+install-local-sites: install kind-create-site-clusters ## install the local environment along with two local cluster for sites
 
 .PHONY: deploy
 deploy: ## Deploy to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV) | $(KUBECTL) apply -f -
+	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local | $(KUBECTL) apply -f -
 
 .PHONY: undeploy
 undeploy: ## Undeploy  from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV) | $(KUBECTL) delete --ignore-not-found=true -f -
+	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local | $(KUBECTL) delete --ignore-not-found=true -f -
 
 .PHONY: local-deploy-base
 local-deploy-base: ## Deploy base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ deploying base...${RESET}"
-	@cp -pf ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME) $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
+	@cp -pf ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME) $(KUSTOMIZE_DIR)/local/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | $(KUBECTL) apply -f -
-	rm $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
+	rm $(KUSTOMIZE_DIR)/local/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 
 .PHONY: local-deploy-db
 local-deploy-db: local-deploy-base ## Deploy db manifests for local env
@@ -50,7 +45,7 @@ local-deploy-db: local-deploy-base ## Deploy db manifests for local env
 .PHONY: local-undeploy-base
 local-undeploy-base: local-undeploy-db ## Delete base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@touch $(KUSTOMIZE_DIR)/$(KIO_WEB_APP_ENV)/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
+	@touch $(KUSTOMIZE_DIR)/local/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | $(KUBECTL) delete --ignore-not-found=true -f -
 
 .PHONY: local-undeploy-db
