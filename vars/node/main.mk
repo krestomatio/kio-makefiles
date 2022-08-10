@@ -1,4 +1,7 @@
-## npx commitlint
+# node
+NVM_VERSION ?= 0.39.1
+
+# npx commitlint
 ifeq ($(PULL_BASE_SHA),HEAD)
 COMMITLINT_FROM ?= HEAD~1
 else

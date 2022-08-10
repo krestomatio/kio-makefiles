@@ -2,14 +2,13 @@
 
 
 PHONY: nvm-install
-nvm-install: NVM_VERSION ?= $(shell curl -s "https://github.com/nvm-sh/nvm/releases/latest/download" 2>&1 | sed "s/^.*download\/\([^\"]*\).*/\1/")
 nvm-install: ## Install NVM
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifneq (0, $(shell bash -l -c 'type -t nvm >/dev/null; echo $$?'))
 	@{ \
 	set -e ;\
 	test -f ~/.bash_profile || touch ~/.bash_profile ;\
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(NVM_VERSION)/install.sh | bash ;\
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$(NVM_VERSION)/install.sh | bash ;\
 	}
 endif
 	@echo -e "\nRunning 'nvm install':"
