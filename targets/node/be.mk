@@ -154,7 +154,7 @@ kind-stop-site-clusters: ## Stop container of kind clusters for sites
 	done
 
 .PHONY: kubeconfig-local
-kubeconfig-local: konfig ## Generate and overwrite kubeconfig file for kio web app role
+kubeconfig-local: kubectl konfig ## Generate and overwrite kubeconfig file for kio web app role
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ saving new kubeconfig: $(KIO_WEB_APP_KUBECONFIG_NAME)${RESET}"
 	@mkdir ~/.kube
