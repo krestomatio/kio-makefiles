@@ -86,7 +86,7 @@ kubeconfig-remote-if: vault ## download kubeconfig file for kio web app role, bu
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)))
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
-	@mkdir ~/.kube
+	@mkdir -p ~/.kube
 	@$(VAULT) kv get -field $(KIO_WEB_APP_KUBECONFIG_NAME) kio_secrets/kio-web-app > ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
 endif
 
@@ -94,7 +94,7 @@ endif
 kubeconfig-remote: vault ## download and overwrite kubeconfig file for kio web app role
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
-	@mkdir ~/.kube
+	@mkdir -p ~/.kube
 	@$(VAULT) kv get -field $(KIO_WEB_APP_KUBECONFIG_NAME) kio_secrets/kio-web-app > ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
 
 .PHONY: kubeconfig-remove
@@ -157,7 +157,7 @@ kind-stop-site-clusters: ## Stop container of kind clusters for sites
 kubeconfig-local: kubectl konfig ## Generate and overwrite kubeconfig file for kio web app role
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ saving new kubeconfig: $(KIO_WEB_APP_KUBECONFIG_NAME)${RESET}"
-	@mkdir ~/.kube
+	@mkdir -p ~/.kube
 	@rm -f ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	@$(KONFIG) export $(addprefix kind-, $(KIND_SITE_CLUSTER_NAMES)) >> ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	@for cluster in $(KIND_SITE_CLUSTER_NAMES); do \
