@@ -9,7 +9,7 @@ KUBE_CURRENT_CONTEXT = $(shell $(KUBECTL) config current-context)
 KIO_WEB_APP_KUBECONFIG_NAME ?= dev-kubeconfig-kio-web-app
 
 .PHONY: install
-install: kustomize skaffold kubectl dot-env-download-if ## install the environment
+install: kustomize skaffold kubectl dot-env-download-if kind-create-local-cluster ## install the environment
 
 .PHONY: install-remote-sites
 install-remote-sites: install kubeconfig-remote ## install the local environment using remote cluster for sites
@@ -115,6 +115,9 @@ dot-env-download: vault ## download and overwrite .env file for kio web app api
 dot-env-remove: ## Remove .env file for kio web app api
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	rm -f .env
+
+.PHONY: kind-create-local-cluster
+kind-create-local-cluster: kind-create kind-start kind-context ## Create/Start kind local cluster
 
 .PHONY: kind-create-site-clusters
 kind-create-site-clusters: konfig kind ## Create/Start kind clusters for sites
