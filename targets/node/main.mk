@@ -13,6 +13,7 @@ ifneq (0, $(shell bash -l -c 'type -t nvm >/dev/null; echo $$?'))
 endif
 	@echo -e "\nRunning 'nvm install':"
 	@bash -l -c 'pushd /tmp/ && source "$(HOME)/.nvm/nvm.sh" && popd && nvm install'
+	@[ -f $(HOME)/.bash_profile ] && [ ! -s $(HOME)/.bash_profile ] && rm $(HOME)/.bash_profile || true
 
 PHONY: npm-install
 npm-install: ## Install NPM
