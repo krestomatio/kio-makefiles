@@ -58,7 +58,7 @@ testing-deploy-samples-safe: ## Try test deployment samples
 testing-deploy-samples: ## Test deployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | kubectl apply -f -
-	kubectl wait --for=condition=ready --timeout=600s Site site-sample
+	kubectl wait --for=condition=ready --timeout=900s Site site-sample
 
 .PHONY: testing-undeploy
 testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undeploy-restore ## Test undeployment using kustomize
@@ -66,7 +66,7 @@ testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undep
 .PHONY: testing-undeploy-samples
 testing-undeploy-samples: ## Test undeployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/samples | kubectl delete --ignore-not-found=true --wait=true --timeout=600s -f - || echo
+	kustomize build config/samples | kubectl delete --ignore-not-found=true --wait=true --timeout=900s -f - || echo
 
 .PHONY: testing-manager-logs
 testing-manager-logs: ## Output logs from all managers in namespace
