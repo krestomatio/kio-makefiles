@@ -43,11 +43,12 @@ testing-deploy-apply-safe: ## Try test deployment operators
 .PHONY: testing-deploy-apply
 testing-deploy-apply: ## Test deployment operators
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | kubectl apply -f -
-	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | kubectl apply -f -
-	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | kubectl apply -f -
-	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | kubectl apply -f -
-	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl apply -f -
+	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | $(KUBECTL) apply -f -
+	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | $(KUBECTL) apply -f -
+	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) apply -f -
+	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | $(KUBECTL) apply -f -
+	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) apply -f -
+	$(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete pod -l control-plane=controller-manager --field-selector=status.phase!=Running
 
 .PHONY: testing-deploy-samples-safe
 testing-deploy-samples-safe: ## Try test deployment samples
@@ -57,8 +58,8 @@ testing-deploy-samples-safe: ## Try test deployment samples
 .PHONY: testing-deploy-samples
 testing-deploy-samples: ## Test deployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/samples | kubectl apply -f -
-	kubectl wait --for=condition=ready --timeout=900s Site site-sample
+	kustomize build config/samples | $(KUBECTL) apply -f -
+	$(KUBECTL) wait --for=condition=ready --timeout=900s Site site-sample
 
 .PHONY: testing-undeploy
 testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undeploy-restore ## Test undeployment using kustomize
@@ -66,23 +67,23 @@ testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undep
 .PHONY: testing-undeploy-samples
 testing-undeploy-samples: ## Test undeployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/samples | kubectl delete --ignore-not-found=true --wait=true --timeout=900s -f - || echo
+	kustomize build config/samples | $(KUBECTL) delete --ignore-not-found=true --wait=true --timeout=900s -f - || echo
 
 .PHONY: testing-manager-logs
 testing-manager-logs: ## Output logs from all managers in namespace
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kubectl -n ${TEST_OPERATOR_NAMESPACE} logs -l control-plane=controller-manager -c manager --tail=-1 --limit-bytes=10240000
+	$(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} logs -l control-plane=controller-manager -c manager --tail=-1 --limit-bytes=10240000
 
 .PHONY: testing-undeploy-delete
 testing-undeploy-delete: ## Test undeployment delete operators
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build --load-restrictor LoadRestrictionsNone config/testing | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
 	# in case sc remains
-	kubectl delete --ignore-not-found=true sc site-site-sample-nfs-sc || echo
+	$(KUBECTL) delete --ignore-not-found=true sc site-site-sample-nfs-sc || echo
 
 .PHONY: testing-undeploy-restore
 testing-undeploy-restore: ## Test undeployment restore files
@@ -110,9 +111,9 @@ testing-undeploy-restore: ## Test undeployment restore files
 deploy-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/manager && kustomize edit set image controller=$(BUILD_IMG)
-	kustomize build config/operators | kubectl apply -f -
+	kustomize build config/operators | $(KUBECTL) apply -f -
 
 .PHONY: undeploy-operators
 undeploy-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/operators | kubectl delete --ignore-not-found=true --timeout=600s -f -
+	kustomize build config/operators | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f -
