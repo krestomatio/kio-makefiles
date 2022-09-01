@@ -48,7 +48,8 @@ testing-deploy-apply: ## Test deployment operators
 	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) apply -f -
 	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | $(KUBECTL) apply -f -
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) apply -f -
-	$(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete pod -l control-plane=controller-manager --field-selector=status.phase!=Running
+	# wait for kio-operator deploy to be available, otherwise recreate pod
+	timeout 120 bash -c "until $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} wait --for=condition=available --timeout=30s deploy ${TEST_OPERATOR_NAMEPREFIX}controller-manager &>/dev/null; do $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete pod -l control-plane=controller-manager --field-selector=status.phase!=Running; done"
 
 .PHONY: testing-deploy-samples-safe
 testing-deploy-samples-safe: ## Try test deployment samples
@@ -59,7 +60,7 @@ testing-deploy-samples-safe: ## Try test deployment samples
 testing-deploy-samples: ## Test deployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | $(KUBECTL) apply -f -
-	$(KUBECTL) wait --for=condition=ready --timeout=900s Site site-sample
+	$(KUBECTL) wait --for=condition=ready --timeout=1200s Site site-sample
 
 .PHONY: testing-undeploy
 testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undeploy-restore ## Test undeployment using kustomize
@@ -67,7 +68,7 @@ testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undep
 .PHONY: testing-undeploy-samples
 testing-undeploy-samples: ## Test undeployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	kustomize build config/samples | $(KUBECTL) delete --ignore-not-found=true --wait=true --timeout=900s -f - || echo
+	kustomize build config/samples | $(KUBECTL) delete --ignore-not-found=true --wait=true --timeout=1200s -f - || echo
 
 .PHONY: testing-manager-logs
 testing-manager-logs: ## Output logs from all managers in namespace
