@@ -37,6 +37,7 @@ KIND_VERSION ?= 0.11.1
 export KIND_IMAGE_VERSION ?= $(K8S_VERSION)
 KONFIG_VERSION ?= 0.2.6
 G12E_VERSION ?= 2.0.9
+FRPC_VERSION ?= 0.44.0
 
 # OS
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')

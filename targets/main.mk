@@ -178,6 +178,25 @@ BUILDX = $(shell which buildx)
 endif
 endif
 
+.PHONY: frpc
+FRPC = $(LOCAL_BIN)/frpc
+frpc: ## Download frpc locally if necessary.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(FRPC)))
+ifeq (,$(shell which frpc 2>/dev/null))
+	@echo -e "${YELLOW}++ Downloading frpc to $(FRPC)${RESET}"
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(FRPC)) ;\
+	curl -sSLo - https://github.com/fatedier/frp/releases/download/v$(FRPC_VERSION)/frp_$(FRPC_VERSION)_$(OS)_$(ARCH).tar.gz | \
+	tar xzf - -C /tmp/ ;\
+	mv /tmp/frp_$(FRPC_VERSION)_$(OS)_$(ARCH)/frpc $(dir $(FRPC))/frpc ;\
+	}
+else
+FRPC = $(shell which frpc)
+endif
+endif
+
 .PHONY: kind-create
 kind-create: kind ## Create kind clusters
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
