@@ -98,7 +98,7 @@ kubeconfig-remove: ## Remove kubeconfig file for kio web app role
 	rm -f ~/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)
 
 .PHONY: dot-env-download-if
-dot-env-download-if: vault ## download and overwrite .env file for kio web app api, but only if it does not exist on disk
+dot-env-download-if: vault ## download .env file for kio web app api, but only if it does not exist on disk
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard .env))
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"

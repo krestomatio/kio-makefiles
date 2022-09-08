@@ -3,7 +3,7 @@
 
 ## Download files
 PHONY: config-js-download-if
-config-js-download-if: vault ## download and overwrite config.js file for kio web app api, but only if it does not exist on disk
+config-js-download-if: vault ## download config.js file for kio web app api, but only if it does not exist on disk
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard .env))
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"

@@ -56,3 +56,32 @@ npm-pretty: ## NPM pretty
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nRunning 'npm run pretty':"
 	@bash -l -c 'npm run pretty'
+
+
+##@ FRP
+PHONY: frpc-ini-download-if
+frpc-ini-download-if: vault ## download frpc.ini file, but only if it does not exist on disk
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(FRPC_INI_DEST)))
+	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
+	@$(VAULT) kv get -field $(FRPC_INI_VAULT_KEY) $(FRPC_INI_VAULT_PATH) > $(FRPC_INI_DEST)
+endif
+
+PHONY: frpc-ini-download
+frpc-ini-download: vault ## download and overwrite frpc.ini file
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
+	@$(VAULT) kv get -field $(FRPC_INI_VAULT_KEY) $(FRPC_INI_VAULT_PATH) > $(FRPC_INI_DEST)
+
+.PHONY: frpc-tunnel-subdomain-env
+frpc-tunnel-subdomain-env: ## Update frpc tunnel subdomain var in .env
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard .env))
+	sed -i "s@^FRP_SUBDOMAIN=.*@FRP_SUBDOMAIN=$(FRP_SUBDOMAIN)@" .env
+endif
+
+.PHONY: frpc-tunnel
+frpc-tunnel: frpc frpc-ini-download-if ## Connect to create a tunnel using frp client
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "${GREEN}+ public url: https://$(FRPC_INI_SUBDOMAIN_INFO).tunnel.jx.krestomat.io${RESET}"
+	$(FRPC) -c $(FRPC_INI_DEST)
