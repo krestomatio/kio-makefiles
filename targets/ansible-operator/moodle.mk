@@ -1,4 +1,4 @@
-##@ M4e
+##@ Moodle
 
 
 testing_deploy_postgres_cr ?= https://raw.githubusercontent.com/krestomatio/postgres-operator/main/config/samples/postgres_v1alpha1_postgres.yaml
@@ -22,6 +22,6 @@ ifeq (test, $(MOLECULE_SEQUENCE))
 	@$(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete --ignore-not-found=true --timeout=600s -f $(testing_deploy_postgres_cr)
 	@$(KUSTOMIZE) build config/testing/postgres | kubectl delete --ignore-not-found=true --timeout=600s -f - || echo
 	@cd config/testing/postgres; \
-	$(KUSTOMIZE) edit set namespace m4e-test; \
-	$(KUSTOMIZE) edit set nameprefix m4e-
+	$(KUSTOMIZE) edit set namespace moodle-test; \
+	$(KUSTOMIZE) edit set nameprefix moodle-
 endif

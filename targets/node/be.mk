@@ -173,7 +173,7 @@ image-pull-secret: vault ## Download and store image pull secret
 operator-env-secret: vault ## Store operator secret to add as environment variables
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@AUTH_JWT_USERS_KEY=$$($(VAULT) kv get -field kio-api-env kio_secrets/kio-web-app | sed -n 's/^AUTH_JWT_OPERATORS_KEY=//p'); \
-	$(KUBECTL) -n m4e-operator-system create secret generic operator-env-secret \
+	$(KUBECTL) -n moodle-operator-system create secret generic operator-env-secret \
 		--dry-run=client --save-config -o yaml \
 		--from-literal=JWT_TOKEN_SECRET=$${AUTH_JWT_USERS_KEY} \
 		| kubectl apply -f -

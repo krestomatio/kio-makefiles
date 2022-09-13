@@ -22,7 +22,7 @@ testing-deploy-prepare: ## Test deployment preparation
 	kustomize edit set image testing=${OPERATOR_IMAGE}; \
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
 	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
-	cd config/testing/m4e; \
+	cd config/testing/moodle; \
 	kustomize edit set namespace ${TEST_OPERATOR_NAMESPACE}; \
 	kustomize edit set nameprefix ${TEST_OPERATOR_NAMEPREFIX}
 	cd config/testing/keydb; \
@@ -46,7 +46,7 @@ testing-deploy-apply: ## Test deployment operators
 	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | $(KUBECTL) apply -f -
 	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | $(KUBECTL) apply -f -
 	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) apply -f -
-	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | $(KUBECTL) apply -f -
+	kustomize build config/testing/moodle | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}moodle-operator@${TEST_OPERATOR_NAMEPREFIX}moodle@" | $(KUBECTL) apply -f -
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) apply -f -
 	# wait for kio-operator deploy to be available, otherwise recreate pod
 	timeout 120 bash -c "until $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} wait --for=condition=available --timeout=30s deploy ${TEST_OPERATOR_NAMEPREFIX}controller-manager &>/dev/null; do $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete pod -l control-plane=controller-manager --field-selector=status.phase!=Running; done"
@@ -79,7 +79,7 @@ testing-manager-logs: ## Output logs from all managers in namespace
 testing-undeploy-delete: ## Test undeployment delete operators
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
-	kustomize build config/testing/m4e | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}m4e-operator@${TEST_OPERATOR_NAMEPREFIX}m4e@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
+	kustomize build config/testing/moodle | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}moodle-operator@${TEST_OPERATOR_NAMEPREFIX}moodle@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
@@ -93,7 +93,7 @@ testing-undeploy-restore: ## Test undeployment restore files
 	kustomize edit set image testing=testing-operator; \
 	kustomize edit set namespace kio-test; \
 	kustomize edit set nameprefix kio-
-	cd config/testing/m4e; \
+	cd config/testing/moodle; \
 	kustomize edit set namespace kio-test; \
 	kustomize edit set nameprefix kio-
 	cd config/testing/keydb; \
