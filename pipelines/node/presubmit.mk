@@ -5,4 +5,4 @@ multiarch-image: buildx-k8s-multiarch buildx-image ## Multiarch image build with
 pr-preview: jx-preview ## Create preview using JX
 
 .PHONY: lint
-lint: npm-ci npm-lint ## Project linting pipeline
+lint: npm-ci npx-commitlint npm-lint ## Project linting pipeline
