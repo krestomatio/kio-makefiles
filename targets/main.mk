@@ -305,30 +305,30 @@ skopeo-copy: ## Copy images using skopeo
 helmfile-preview: chart-values ## Create preview environment using helmfile
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment with helmfile..."
-	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" preview/helmfile.yaml
+	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" $(PREVIEW_HELMFILE)
 	APP_NAME=$(HELMFILE_APP_NAME) \
 	SUBDOMAIN=${HELMFILE_APP_NAME} \
 	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
 	VERSION=$(BUILD_VERSION) \
-	helmfile -f preview sync
-	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" preview/helmfile.yaml
+	helmfile -f $(PREVIEW_HELMFILE) sync
+	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" $(PREVIEW_HELMFILE)
 
 .PHONY: helmfile-preview-destroy
 helmfile-preview-destroy: ## Destroy preview environment using helmfile
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\Destroying preview environment with helmfile..."
-	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" preview/helmfile.yaml
+	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" $(PREVIEW_HELMFILE)
 	APP_NAME=$(HELMFILE_APP_NAME) \
 	SUBDOMAIN=${HELMFILE_APP_NAME} \
 	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
 	VERSION=$(BUILD_VERSION) \
-	helmfile -f preview delete
+	helmfile -f $(PREVIEW_HELMFILE) delete
 	kubectl delete --ignore-not-found=true --wait=true --timeout=600s ns ${HELMFILE_APP_NAME}
-	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" preview/helmfile.yaml
+	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" $(PREVIEW_HELMFILE)
 
 .PHONY: chart-values
 chart-values: ## handle chart values like version, tag and respository

@@ -106,6 +106,11 @@ endif
 CHANGELOG_PREV_TAG ?= $(GIT_RELEASE_LAST_TAG)
 HELMFILE_APP_NAME ?= $(REPO_NAME).$(GIT_RELEASE_BRANCH_NUMBER)
 endif
+ifeq ($(JOB_NAME),release)
+PREVIEW_HELMFILE ?= preview/helmfile.yaml
+else
+PREVIEW_HELMFILE ?= preview/helmfile-$(JOB_NAME).yaml
+endif
 
 # Molecule
 ifeq ($(PULL_NUMBER),)
