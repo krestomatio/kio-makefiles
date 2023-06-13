@@ -133,7 +133,7 @@ CSI_NFS_BASE_URL_INSTALL ?= github.com/krestomatio/nfs-operator/config/csi-drive
 endif
 
 ## VAULT
-export VAULT_ADDR ?= https://vault.jx.krestomat.io
+export VAULT_ADDR ?= https://vault.krestomat.io
 VAULT_VERSION ?= 1.9.3
 
 # colors
