@@ -295,11 +295,11 @@ set-manager-image: ## Set manager image using kustomize
 skopeo-copy: ## Copy images using skopeo
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	# full version
-	skopeo copy --all --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG)
+	skopeo copy --retry-times 3 --all --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG)
 	# major + minor
-	skopeo copy --all --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG_MINOR)
+	skopeo copy --retry-times 3 --all --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG_MINOR)
 	# major
-	skopeo copy --all --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG_MAJOR)
+	skopeo copy --retry-times 3 --all --src-tls-verify=$(SKOPEO_SRC_TLS) --dest-tls-verify=$(SKOPEO_DEST_TLS) docker://$(BUILD_IMG) docker://$(IMG_MAJOR)
 
 .PHONY: helmfile-preview
 helmfile-preview: chart-values ## Create preview environment using helmfile
