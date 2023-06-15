@@ -1,5 +1,5 @@
 .PHONY: multiarch-image
-multiarch-image: buildx-image
+multiarch-image: buildx-use buildx-image
 
 .PHONY: changelog
 changelog: jx-changelog ## Generate changelog

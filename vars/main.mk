@@ -81,6 +81,10 @@ SKIP_PIPELINE = true
 $(info BUILD_VERSION not set, skipping...)
 endif
 
+# buildx
+BUILDX_INSTANE_NAME ?= multiarch-builder
+BUILDX_PROGRESS ?= plain
+
 # skopeo
 SKOPEO_SRC_TLS ?= True
 SKOPEO_DEST_TLS ?= true

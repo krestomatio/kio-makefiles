@@ -78,13 +78,13 @@ buildah-push: ## Push the container image using buildah
 	buildah --storage-driver vfs push $(BUILD_IMG)
 
 .PHONY: buildx-image
-buildx-image: buildx ## Build container image with docker buildx
+buildx-image: ## Build container image with docker buildx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
-	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) \
+	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
 else
-	docker buildx build . --pull --push --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG)
+	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG)
 endif
 
 .PHONY: skaffold
@@ -374,8 +374,17 @@ jx-preview: chart-values ## Create preview environment using jx
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
 	jx preview create
 
+.PHONY: buildx-use
+buildx-use: buildx ## Set buildx instance to use
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifneq ($(BUILDX_INSTANE_NAME),)
+	docker buildx use $(BUILDX_INSTANE_NAME)
+else
+	@echo -e "${YELLOW}++ no buildx instance name set${RESET}"
+endif
+
 .PHONY: buildx-k8s-multiarch
-buildx-k8s-multiarch: ## Create buildx k8s multiarch instance builder
+buildx-k8s-multiarch: buildx ## Create buildx k8s multiarch instance builder
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	docker buildx create --use --bootstrap --append --name=multiarch-builder --platform=linux/amd64 --node=multiarch-builder-amd64-k8s --driver=kubernetes --driver-opt="qemu.install=true,namespace=jx,requests.cpu=100m,requests.memory=500Mi" multiarch-builder-amd64-k8s
 	docker buildx create --bootstrap --append --name=multiarch-builder --platform=linux/arm64 --node=multiarch-builder-arm64-k8s --driver=kubernetes --driver-opt="qemu.install=true,namespace=jx,requests.cpu=100m,requests.memory=500Mi" multiarch-builder-arm64-k8s
