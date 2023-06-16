@@ -13,11 +13,15 @@ rm -rf $$TMP_DIR ;\
 }
 endef
 
-.PHONY: go-lint
-go-lint: ## Verifies `golint` passes
+.PHONY: go-lint-install
+go-lint-install: ## Install go linter package
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(call go-install,$(LOCAL_BIN)/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.2)
-	bin/golangci-lint run --timeout 5m
+	$(call go-install,$(LOCAL_BIN)/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3)
+
+.PHONY: go-lint
+go-lint: go-lint-install ## Verifies `golint` passes
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	bin/golangci-lint run --verbose
 
 .PHONY: kio-go-cache
 kio-go-cache: ## Verifies `golint` passes
