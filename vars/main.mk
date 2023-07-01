@@ -31,13 +31,13 @@ CONTAINER_BUILDER ?= docker
 OPERATOR_VERSION ?= 1.21.0
 KUSTOMIZE_VERSION ?= 4.1.3
 SKAFFOLD_VERSION ?= 1.35.2
-K8S_VERSION ?= 1.23.6
+K8S_VERSION ?= 1.26.6
 KUBECTL_VERSION ?= $(K8S_VERSION)
-KIND_VERSION ?= 0.11.1
+KIND_VERSION ?= 0.20.0
 export KIND_IMAGE_VERSION ?= $(K8S_VERSION)
-KONFIG_VERSION ?= 0.2.6
 G12E_VERSION ?= 2.0.9
-FRPC_VERSION ?= 0.44.0
+FRPC_VERSION ?= 0.50.0
+ENVCONSUL_VERSION ?= 0.13.2
 
 # OS
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -143,6 +143,8 @@ endif
 ## VAULT
 export VAULT_ADDR ?= https://vault.krestomat.io
 VAULT_VERSION ?= 1.9.3
+VAULT_INTERNAL_MOUNT_POINT ?= kio-internal
+VAULT_LOCAL_MOUNT_POINT ?= kio-web-app-local
 
 # colors
 ## from https://gist.github.com/rsperl/d2dfe88a520968fbc1f49db0a29345b9

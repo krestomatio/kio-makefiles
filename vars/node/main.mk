@@ -15,5 +15,4 @@ GIT_ADD_FILES ?= Makefile package.json
 # frp
 export FRP_PROXY_NAME_SUFFIX ?= _$(shell echo $${FRP_SUBDOMAIN:-$$HOSTNAME} | md5sum | cut -c -5)
 FRPC_INI_SUBDOMAIN_INFO ?= <subdomain>
-FRPC_INI_VAULT_PATH ?= kio_secrets/kio-web-app
 FRPC_INI_DEST ?= $(FRPC_INI_VAULT_KEY)

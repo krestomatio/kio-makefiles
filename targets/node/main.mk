@@ -63,15 +63,14 @@ PHONY: frpc-ini-download-if
 frpc-ini-download-if: vault ## download frpc.ini file, but only if it does not exist on disk
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(FRPC_INI_DEST)))
-	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
-	@$(VAULT) kv get -field $(FRPC_INI_VAULT_KEY) $(FRPC_INI_VAULT_PATH) > $(FRPC_INI_DEST)
+	@$(MAKE) frpc-ini-download
 endif
 
 PHONY: frpc-ini-download
 frpc-ini-download: vault ## download and overwrite frpc.ini file
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
-	@$(VAULT) kv get -field $(FRPC_INI_VAULT_KEY) $(FRPC_INI_VAULT_PATH) > $(FRPC_INI_DEST)
+	$(call vault-save-secret-field-in-file,$(FRPC_INI_VAULT_KEY),$(FRPC_INI_VAULT_PATH),$(FRPC_INI_DEST))
 
 .PHONY: frpc-tunnel-subdomain-env
 frpc-tunnel-subdomain-env: ## Update frpc tunnel subdomain var in .env

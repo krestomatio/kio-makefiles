@@ -6,8 +6,24 @@ include $(MK_TARGETS_PROJECT_TYPE_FILE)
 endif
 
 ## General functions
+
+# github_latest_release_version will find latest release version of repo $1
 define github_latest_release_version
-$$(basename $$(curl -fs -o/dev/null -w %{redirect_url} '$(1)/releases/latest') | sed 's/^v//')
+$(shell basename $$(curl -fs -o/dev/null -w %{redirect_url} '$(1)/releases/latest') | sed 's/^v//')
+endef
+
+# vault-save-secret-field-in-file will store field $1 from path $2 to file $3
+define vault-save-secret-field-in-file
+@echo -e "${YELLOW}++ saving field $(1) from path $(2) to file $(3)${RESET}"
+@vault_field=$$($(VAULT) kv get -field "$(1)" "$(2)");\
+test "$$vault_field" && echo "$$vault_field" > "$(3)"
+endef
+
+# vault-save-secret-json-to-env will store json secret in path $1 to dotfile $2
+define vault-save-secret-json-to-env
+@echo -e "${YELLOW}++ saving json secret from path $(1) to dotfile $(2)${RESET}"
+@vault_json=$$($(ENVCONSUL) -pristine -no-prefix -once -vault-retry=0 -secret $(1) env);\
+test "$$vault_json" && echo "$$vault_json" | sort > "$(2)"
 endef
 
 ## General targets
@@ -123,24 +139,6 @@ KUBECTL = $(shell which kubectl)
 endif
 endif
 
-.PHONY: konfig
-KONFIG = $(LOCAL_BIN)/konfig
-konfig: ## Download konfig locally if necessary.
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq (,$(wildcard $(KONFIG)))
-ifeq (,$(shell which konfig 2>/dev/null))
-	@echo -e "${YELLOW}++ Downloading konfig to $(KONFIG)${RESET}"
-	@{ \
-	set -e ;\
-	mkdir -p $(dir $(KONFIG)) ;\
-	curl -sSL https://github.com/corneliusweig/konfig/raw/v$(KONFIG_VERSION)/konfig -o $(KONFIG) ;\
-	chmod +x $(KONFIG) ;\
-	}
-else
-KONFIG = $(shell which konfig)
-endif
-endif
-
 .PHONY: kind
 KIND = $(LOCAL_BIN)/kind
 kind: ## Download kind locally if necessary.
@@ -166,7 +164,7 @@ buildx: ## Download buildx locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(BUILDX)))
 ifeq (,$(shell which buildx 2>/dev/null))
-	$(info Downloading buildx to $(BUILDX))
+	@echo -e "${YELLOW}++ Downloading buildx to $(BUILDX)${RESET}"
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(BUILDX)) ;\
@@ -211,8 +209,14 @@ kind-delete: ## Delete kind clusters
 .PHONY: kind-context
 kind-context: ## Use kind cluster by setting its context
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq ($(KIND_CONTEXT_NO_PREFIX),true)
+	@$(KUBECTL) config use-context $(KIND_CLUSTER_NAME)
+else
 	@$(KUBECTL) config use-context kind-$(KIND_CLUSTER_NAME)
+endif
+ifneq ($(KIND_NAMESPACE),)
 	@$(KUBECTL) config set-context --current --namespace=$(KIND_NAMESPACE)
+endif
 
 .PHONY: kind-start
 kind-start: ## Start kind cluster container
@@ -264,12 +268,32 @@ VAULT = $(shell which vault)
 endif
 endif
 
+.PHONY: envconsul
+ENVCONSUL = $(LOCAL_BIN)/envconsul
+envconsul: ## Download envconsul CLI locally if necessary.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(ENVCONSUL)))
+ifeq (,$(shell which envconsul 2>/dev/null))
+	@echo -e "${YELLOW}++ Downloading envconsul to $(ENVCONSUL)${RESET}"
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(ENVCONSUL)) ;\
+	curl -sSL https://releases.hashicorp.com/envconsul/$(ENVCONSUL_VERSION)/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip -o /tmp/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip ;\
+	unzip -d $(dir $(KUSTOMIZE))/ /tmp/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip ;\
+	chmod +x $(ENVCONSUL) ;\
+	}
+else
+ENVCONSUL = $(shell which envconsul)
+endif
+endif
+
 .PHONY: vault-login
 vault-login: VAULT_LOGIN_METHOD = oidc
+vault-login: VAULT_LOGIN_PATH = google
 vault-login: vault ## Login with Vault using method set by 'VAULT_LOGIN_METHOD'. Default is oidc
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
-	@$(VAULT) login -method=$(VAULT_LOGIN_METHOD)
+	@$(VAULT) login -method=$(VAULT_LOGIN_METHOD) -path=$(VAULT_LOGIN_PATH) -no-print
 
 .PHONY: git
 git: chart-values ## Git add, commit, tag and push
