@@ -396,7 +396,7 @@ jx-preview: chart-values ## Create preview environment using jx
 	@echo -e "\nCreating preview environment..."
 	VERSION=$(BUILD_VERSION) \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
-	jx preview create
+	jx preview create -f $(PREVIEW_HELMFILE)
 
 .PHONY: buildx-use
 buildx-use: buildx ## Set buildx instance to use
