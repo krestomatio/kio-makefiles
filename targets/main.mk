@@ -330,9 +330,14 @@ helmfile-preview: chart-values ## Create preview environment using helmfile
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "\nCreating preview environment with helmfile..."
 	sed -i "s@    - jx-values.yaml@  # - jx-values.yaml@" $(PREVIEW_HELMFILE)
-	echo $$KUBECONFIG
-	$(KUBECTL) config get-contexts
-
+	APP_NAME=$(HELMFILE_APP_NAME) \
+	SUBDOMAIN=${HELMFILE_APP_NAME} \
+	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
+	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
+	DOCKER_REGISTRY_ORG=$(BUILD_REGISTRY_ORG) \
+	VERSION=$(BUILD_VERSION) \
+	helmfile -f $(PREVIEW_HELMFILE) sync
+	sed -i "s@  # - jx-values.yaml@    - jx-values.yaml@" $(PREVIEW_HELMFILE)
 
 .PHONY: helmfile-preview-destroy
 helmfile-preview-destroy: ## Destroy preview environment using helmfile
@@ -343,7 +348,7 @@ helmfile-preview-destroy: ## Destroy preview environment using helmfile
 	SUBDOMAIN=${HELMFILE_APP_NAME} \
 	PREVIEW_NAMESPACE=${HELMFILE_APP_NAME} \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
-	DOCKER_REGISTRY_ORG=$(REPO_OWNER) \
+	DOCKER_REGISTRY_ORG=$(BUILD_REGISTRY_ORG) \
 	VERSION=$(BUILD_VERSION) \
 	helmfile -f $(PREVIEW_HELMFILE) delete
 	kubectl delete --ignore-not-found=true --wait=true --timeout=600s ns ${HELMFILE_APP_NAME}
@@ -391,6 +396,7 @@ jx-preview: chart-values ## Create preview environment using jx
 	@echo -e "\nCreating preview environment..."
 	VERSION=$(BUILD_VERSION) \
 	DOCKER_REGISTRY=$(BUILD_REGISTRY) \
+	DOCKER_REGISTRY_ORG=$(BUILD_REGISTRY_ORG) \
 	jx preview create -f $(PREVIEW_HELMFILE)
 
 .PHONY: buildx-use
