@@ -47,7 +47,7 @@ testing-deploy-apply: ## Test deployment operators
 	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | $(KUBECTL) apply -f -
 	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) apply -f -
 	kustomize build config/testing/moodle | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}moodle-operator@${TEST_OPERATOR_NAMEPREFIX}moodle@" | $(KUBECTL) apply -f -
-	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) apply -f -
+	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) apply --server-side=true -f -
 	# wait for kio-operator deploy to be available, otherwise recreate pod
 	timeout 120 bash -c "until $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} wait --for=condition=available --timeout=30s deploy ${TEST_OPERATOR_NAMEPREFIX}controller-manager &>/dev/null; do $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete pod -l control-plane=controller-manager --field-selector=status.phase!=Running; done"
 
