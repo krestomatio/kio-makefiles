@@ -10,7 +10,7 @@ local-install: kustomize kubectl kind-create kind-context deploy-operators insta
 local-uninstall: uninstall undeploy-operators ## Uninstall the local dev env
 
 .PHONY: local-purge
-local-purge: kind-delete ## Purge the local dev env
+local-purge: kind-delete delete-project-bin ## Purge the local dev env
 
 .PHONY: testing-deploy
 testing-deploy: testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize

@@ -414,6 +414,17 @@ buildx-k8s-multiarch: buildx ## Create buildx k8s multiarch instance builder
 	docker buildx create --use --bootstrap --append --name=multiarch-builder --platform=linux/amd64 --node=multiarch-builder-amd64-k8s --driver=kubernetes --driver-opt="qemu.install=true,namespace=jx,requests.cpu=100m,requests.memory=500Mi" multiarch-builder-amd64-k8s
 	docker buildx create --bootstrap --append --name=multiarch-builder --platform=linux/arm64 --node=multiarch-builder-arm64-k8s --driver=kubernetes --driver-opt="qemu.install=true,namespace=jx,requests.cpu=100m,requests.memory=500Mi" multiarch-builder-arm64-k8s
 
+.PHONY: delete-project-bin
+delete-project-bin: ## Delete relative bin directory
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq ($(LOCAL_BIN),./bin)
+	-rm -f ./bin/*
+	-rmdir ./bin/
+else
+	@echo -e "${YELLOW}++ bin directory is outside of project: $(LOCAL_BIN)${RESET}"
+	@echo -e "${YELLOW}++ not deleting: '$(LOCAL_BIN)'${RESET}"
+endif
+
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)
 endif

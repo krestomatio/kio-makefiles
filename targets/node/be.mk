@@ -59,7 +59,7 @@ local-undeploy-db: ## Delete db manifests for local env
 	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/db --load-restrictor LoadRestrictionsNone | $(KUBECTL) delete --ignore-not-found=true -f -
 
 .PHONY: local-purge
-local-purge: kind-delete kind-delete-site-clusters kubeconfig-remove dot-env-remove ## Purge local env: base (ns, db, pvc), k8s objects and local cluster
+local-purge: kind-delete kind-delete-site-clusters kubeconfig-remove dot-env-remove delete-project-bin ## Purge local env: base (ns, db, pvc), k8s objects and local cluster
 
 .PHONY: local-dev
 local-dev: install ## Run local dev
