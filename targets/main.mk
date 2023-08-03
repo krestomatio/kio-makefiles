@@ -279,7 +279,7 @@ ifeq (,$(shell which envconsul 2>/dev/null))
 	set -e ;\
 	mkdir -p $(dir $(ENVCONSUL)) ;\
 	curl -sSL https://releases.hashicorp.com/envconsul/$(ENVCONSUL_VERSION)/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip -o /tmp/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip ;\
-	unzip -d $(dir $(KUSTOMIZE))/ /tmp/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip ;\
+	unzip -d $(dir $(ENVCONSUL))/ /tmp/envconsul_$(ENVCONSUL_VERSION)_$(OS)_$(ARCH).zip ;\
 	chmod +x $(ENVCONSUL) ;\
 	}
 else
