@@ -22,23 +22,11 @@ install-remote-sites: install kubeconfig-remote ## install the local environment
 .PHONY: install-local-sites
 install-local-sites: install kind-create-site-clusters ## install the local environment along with two local cluster for sites
 
-.PHONY: deploy
-deploy: ## Deploy to the K8s cluster specified in $KUBECONFIG
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local | $(KUBECTL) apply -f -
-
-.PHONY: undeploy
-undeploy: ## Undeploy  from the K8s cluster specified in $KUBECONFIG
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local | $(KUBECTL) delete --ignore-not-found=true -f -
-
 .PHONY: local-deploy-base
 local-deploy-base: ## Deploy base manifests for local env
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ deploying base...${RESET}"
-	@cp -pf $(KIO_WEB_APP_KUBECONFIG) $(KUSTOMIZE_DIR)/local/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 	@$(KUSTOMIZE) build $(KUSTOMIZE_DIR)/local/base | $(KUBECTL) apply -f -
-	rm $(KUSTOMIZE_DIR)/local/base/$(KIO_WEB_APP_KUBECONFIG_NAME)
 
 .PHONY: local-deploy-db
 local-deploy-db: local-deploy-base ## Deploy db manifests for local env
@@ -199,3 +187,10 @@ api-endpoint-dns:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(KUBECTL) -n kube-system get cm coredns -o json |  sed -e 's@.:53 {\\n    errors\\n    health@.:53 {\\n    errors\\n    hosts {\\n       $(KIND_HOST_IP) api-local.krestomat.io\\n       fallthrough\\n    }\\n    health@' | $(KUBECTL) replace -f -
 	@$(KUBECTL) -n kube-system rollout restart deployment/coredns
+
+
+.PHONY: kubeconfig-secret
+kubeconfig-secret: ## Create kubeconfig secret
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@$(KUBECTL) -n $(KIND_NAMESPACE) delete secret server-kubeconfig-secret --ignore-not-found
+	@$(KUBECTL) -n $(KIND_NAMESPACE) create secret generic server-kubeconfig-secret --from-literal=local-kubeconfig-kio-web-app="$$(cat $(KUBECONFIG))"
