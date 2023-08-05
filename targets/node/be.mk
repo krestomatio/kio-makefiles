@@ -170,16 +170,16 @@ operator-env-secret: vault ## Store operator secret to add as environment variab
 .PHONY: deploy-kio-operators
 deploy-kio-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in current cluster
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@kustomize build .config/local/kio/operators | $(KUBECTL) apply -f -
+	@$(KUSTOMIZE) build .config/local/kio/operators | $(KUBECTL) apply -f -
 	@sleep 1
-	@kustomize build .config/local/kio/flavor | $(KUBECTL) apply -f -
+	@$(KUSTOMIZE) build .config/local/kio/flavor | $(KUBECTL) apply -f -
 
 .PHONY: undeploy-kio-operators
 undeploy-kio-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in current cluster
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s Site --all
 	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s Flavor --all
-	@kustomize build .config/local/kio/operators/ | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f -
+	@$(KUSTOMIZE) build .config/local/kio/operators/ | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f -
 
 .PHONY: api-endpoint-dns
 api-endpoint-dns: KIND_HOST_IP = $(shell docker network inspect kind --format '{{ (index .IPAM.Config 0).Gateway }}')
