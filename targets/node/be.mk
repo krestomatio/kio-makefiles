@@ -9,9 +9,7 @@ KIO_WEB_APP_KUBECONFIG_NAME ?= local-kubeconfig-kio-web-app
 KIO_WEB_APP_KUBECONFIG ?= $(shell echo "$${HOME}/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)")
 KIO_WEB_APP_VAULT_ENVVARS_PATH ?= $(VAULT_LOCAL_MOUNT_POINT)/config/be/envvars
 IMAGE_PULL_SECRET_NS ?= kio-operator-system
-ifeq ($(JOB_NAME),)
 export KUBECONFIG := $(KIO_WEB_APP_KUBECONFIG)
-endif
 
 .PHONY: install
 install: kustomize skaffold kubectl dot-env-download-if kind-create-kio-web-app-cluster ## install the environment
