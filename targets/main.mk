@@ -68,9 +68,9 @@ image-build: ## Build container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
 	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG) \
-		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
+		--build-arg COLLECTION_FILE=$(COLLECTION_FILE) --build-arg VERSION=$(VERSION)
 else
-	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG)
+	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG) --build-arg VERSION=$(VERSION)
 endif
 
 .PHONY: image-push
@@ -83,9 +83,9 @@ buildah-build: ## Build the container image using buildah
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
 	buildah --storage-driver vfs bud -t $(BUILD_IMG) . \
-		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
+		--build-arg COLLECTION_FILE=$(COLLECTION_FILE) --build-arg VERSION=$(VERSION)
 else
-	buildah --storage-driver vfs bud -t $(BUILD_IMG) .
+	buildah --storage-driver vfs bud -t $(BUILD_IMG) . --build-arg VERSION=$(VERSION)
 endif
 
 .PHONY: buildah-push
@@ -98,9 +98,9 @@ buildx-image: ## Build container image with docker buildx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
 	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) \
-		--build-arg COLLECTION_FILE=$(COLLECTION_FILE)
+		--build-arg COLLECTION_FILE=$(COLLECTION_FILE) --build-arg VERSION=$(VERSION)
 else
-	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG)
+	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) --build-arg VERSION=$(VERSION)
 endif
 
 .PHONY: skaffold
