@@ -3,6 +3,13 @@
 GALAXY_COLLECTION_NAME ?= krestomatio-k8s-$(VERSION)
 GALAXY_COLLECTION_FILE ?= $(GALAXY_COLLECTION_NAME).tar.gz
 
+.PHONY: build-docs
+build-docs: ## Build docs
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	pip install -r .ansible-ci/requirements.txt
+	ansible-playbook .ansible-ci/docs.yml -i .ansible-ci/inventory/hosts
+	git add docs
+
 .PHONY: galaxy-version
 galaxy-version: ## Bump galaxy version
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
