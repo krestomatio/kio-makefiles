@@ -6,6 +6,12 @@ molecule: ## Testing with molecule
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	set -e; molecule $(MOLECULE_SEQUENCE) -s $(MOLECULE_SCENARIO)
 
+.PHONY: build-docs
+build-docs: ## Build docs
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	ansible-playbook .ansible-ci/docs.yml -i .ansible-ci/inventory/hosts -e operator_version=$(VERSION)
+	git add docs
+
 .PHONY: collection-build
 collection-build: ## Build krestomatio collection from path or git to file
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
