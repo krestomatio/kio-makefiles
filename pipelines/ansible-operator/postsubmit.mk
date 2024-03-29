@@ -5,7 +5,7 @@ multiarch-image: buildx-use buildx-image
 changelog: jx-changelog ## Generate changelog
 
 .PHONY: release
-release: set-manager-image skopeo-copy build-docs ## Run release tasks
+release: set-manager-image build-docs skopeo-copy ## Run release tasks
 
 .PHONY: promote
 promote: git ## Promote release
