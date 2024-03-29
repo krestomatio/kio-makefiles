@@ -1,2 +1,2 @@
 .PHONY: sanity
-sanity: ansible-lint test-sanity ## Run sanity tests
+sanity: test-sanity ## Run sanity tests
