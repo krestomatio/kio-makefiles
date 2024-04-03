@@ -147,6 +147,9 @@ VAULT_VERSION ?= 1.9.3
 VAULT_INTERNAL_MOUNT_POINT ?= kio-internal
 VAULT_LOCAL_MOUNT_POINT ?= kio-web-app-local
 
+## Makejinja
+MAKEJINJA_DATA ?= -D operator_version=$(VERSION)
+
 # colors
 ## from https://gist.github.com/rsperl/d2dfe88a520968fbc1f49db0a29345b9
 ## define standard colors

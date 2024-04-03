@@ -16,12 +16,33 @@ endef
 .PHONY: go-lint-install
 go-lint-install: ## Install go linter package
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(call go-install,$(LOCAL_BIN)/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2)
+	$(call go-install,$(LOCAL_BIN)/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v$(GO_LINT_VERSION))
+
+.PHONY: go-crd-ref-docs-install
+go-crd-ref-docs-install: ## Install go crd-ref-docs package
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(call go-install,$(LOCAL_BIN)/crd-ref-docs,github.com/elastic/crd-ref-docs@v$(CRD_REF_DOCS_VERSION))
 
 .PHONY: go-lint
 go-lint: go-lint-install ## Verifies `golint` passes
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(LOCAL_BIN)/golangci-lint run --verbose
+
+.PHONY: gen-api-docs
+gen-api-docs: go-crd-ref-docs-install ## Generate api docs
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	sed -i "s@kubernetesVersion:.*@kubernetesVersion: $(K8S_VERSION)@" config/docs/go-crd-ref-docs.yaml
+	$(LOCAL_BIN)/crd-ref-docs \
+		--source-path=./api \
+		--renderer=markdown \
+		--config=config/docs/go-crd-ref-docs.yaml \
+		--output-path=docs/api.md
+
+.PHONY: gen-docs
+gen-docs: gen-api-docs ## Generate docs
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	makejinja -i config/templates/docs -o docs/ -f --undefined strict --jinja-suffix .j2 \
+		$(MAKEJINJA_DATA)
 
 .PHONY: kio-go-cache
 kio-go-cache: ## Verifies `golint` passes
