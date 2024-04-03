@@ -16,7 +16,7 @@ endef
 .PHONY: go-lint-install
 go-lint-install: ## Install go linter package
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	$(call go-install,$(LOCAL_BIN)/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3)
+	$(call go-install,$(LOCAL_BIN)/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2)
 
 .PHONY: go-lint
 go-lint: go-lint-install ## Verifies `golint` passes
