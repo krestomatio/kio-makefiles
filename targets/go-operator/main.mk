@@ -8,7 +8,7 @@ TMP_DIR=$$(mktemp -d) ;\
 cd $$TMP_DIR ;\
 go mod init tmp ;\
 echo "Downloading $(2)" ;\
-GOBIN=$(shell dirname $$(realpath $(1))) go install $(2) ;\
+GOBIN=$(shell dirname $$(realpath -m $(1))) go install $(2) ;\
 rm -rf $$TMP_DIR ;\
 }
 endef
@@ -39,7 +39,7 @@ gen-api-docs: go-crd-ref-docs-install ## Generate api docs
 		--output-path=docs/api.md
 
 .PHONY: gen-docs
-gen-docs: gen-api-docs ## Generate docs
+gen-docs: ## Generate docs
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	makejinja -i config/templates/docs -o docs/ -f --undefined strict --jinja-suffix .j2 \
 		$(MAKEJINJA_DOCS_DATA)
