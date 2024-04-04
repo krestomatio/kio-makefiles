@@ -12,8 +12,18 @@ local-uninstall: uninstall undeploy-operators ## Uninstall the local dev env
 .PHONY: local-purge
 local-purge: kind-delete delete-project-bin ## Purge the local dev env
 
+.PHONY: gen-operators-kustomization
+gen-operators-kustomization: ## Generate operators kustomization files
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	makejinja -i config/templates/operators -o config/operators -f --undefined strict \
+		--jinja-suffix .j2 \
+		-D moodle_operator_version=$(MOODLE_OPERATOR_VERSION) \
+		-D postgres_operator_version=$(POSTGRES_OPERATOR_VERSION) \
+		-D nfs_operator_version=$(NFS_OPERATOR_VERSION) \
+		-D keydb_operator_version=$(KEYDB_OPERATOR_VERSION)
+
 .PHONY: testing-deploy
-testing-deploy: testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
+testing-deploy: gen-operators-kustomization testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
 
 .PHONY: testing-deploy-prepare
 testing-deploy-prepare: ## Test deployment preparation

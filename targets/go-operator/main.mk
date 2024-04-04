@@ -42,7 +42,7 @@ gen-api-docs: go-crd-ref-docs-install ## Generate api docs
 gen-docs: gen-api-docs ## Generate docs
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	makejinja -i config/templates/docs -o docs/ -f --undefined strict --jinja-suffix .j2 \
-		$(MAKEJINJA_DATA)
+		$(MAKEJINJA_DOCS_DATA)
 
 .PHONY: kio-go-cache
 kio-go-cache: ## Verifies `golint` passes
