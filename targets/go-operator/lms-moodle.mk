@@ -1,6 +1,6 @@
 ##@ Testing deploy
 
-KIND_CLUSTER_NAME ?= kio-operator
+KIND_CLUSTER_NAME ?= lms-moodle-operator
 KIND_NAMESPACE ?= site-sample
 
 .PHONY: local-install
@@ -58,7 +58,7 @@ testing-deploy-apply: ## Test deployment operators
 	kustomize build config/testing/keydb | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}keydb-operator@${TEST_OPERATOR_NAMEPREFIX}keydb@" | $(KUBECTL) apply -f -
 	kustomize build config/testing/moodle | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}moodle-operator@${TEST_OPERATOR_NAMEPREFIX}moodle@" | $(KUBECTL) apply -f -
 	kustomize build --load-restrictor LoadRestrictionsNone config/testing | $(KUBECTL) apply --server-side=true -f -
-	# wait for kio-operator deploy to be available, otherwise recreate pod
+	# wait for lms-moodle-operator deploy to be available, otherwise recreate pod
 	timeout 120 bash -c "until $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} wait --for=condition=available --timeout=30s deploy ${TEST_OPERATOR_NAMEPREFIX}controller-manager &>/dev/null; do $(KUBECTL) -n ${TEST_OPERATOR_NAMESPACE} delete pod -l control-plane=controller-manager --field-selector=status.phase!=Running; done"
 
 .PHONY: testing-deploy-samples-safe
@@ -101,30 +101,30 @@ testing-undeploy-restore: ## Test undeployment restore files
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/testing; \
 	kustomize edit set image testing=testing-operator; \
-	kustomize edit set namespace kio-test; \
-	kustomize edit set nameprefix kio-
+	kustomize edit set namespace lms-moodle-test; \
+	kustomize edit set nameprefix lms-moodle-
 	cd config/testing/moodle; \
-	kustomize edit set namespace kio-test; \
-	kustomize edit set nameprefix kio-
+	kustomize edit set namespace lms-moodle-test; \
+	kustomize edit set nameprefix lms-moodle-
 	cd config/testing/keydb; \
-	kustomize edit set namespace kio-test; \
-	kustomize edit set nameprefix kio-
+	kustomize edit set namespace lms-moodle-test; \
+	kustomize edit set nameprefix lms-moodle-
 	cd config/testing/nfs; \
-	kustomize edit set namespace kio-test; \
-	kustomize edit set nameprefix kio-
+	kustomize edit set namespace lms-moodle-test; \
+	kustomize edit set nameprefix lms-moodle-
 	cd config/testing/postgres; \
-	kustomize edit set namespace kio-test; \
-	kustomize edit set nameprefix kio-
+	kustomize edit set namespace lms-moodle-test; \
+	kustomize edit set nameprefix lms-moodle-
 
 ##@ Dependant operators
 
 .PHONY: deploy-operators
-deploy-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in ~/.kube/config.
+deploy-operators: ## Deploy LMS Moodle Operator and dependant operators to the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	cd config/manager && kustomize edit set image controller=$(BUILD_IMG)
 	kustomize build config/operators | $(KUBECTL) apply -f -
 
 .PHONY: undeploy-operators
-undeploy-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in ~/.kube/config.
+undeploy-operators: ## Undeploy LMS Moodle Operator and dependant operators from the K8s cluster specified in ~/.kube/config.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/operators | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f -

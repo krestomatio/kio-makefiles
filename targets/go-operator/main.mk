@@ -44,8 +44,8 @@ gen-docs: ## Generate docs
 	makejinja -i config/templates/docs -o docs/ -f --undefined strict --jinja-suffix .j2 \
 		$(MAKEJINJA_DOCS_DATA)
 
-.PHONY: kio-go-cache
-kio-go-cache: ## Verifies `golint` passes
+.PHONY: go-operator-cache
+go-operator-cache: ## Configure go operator cache
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	mkdir -p /shared/$(ARCH)/operator-sdk.$(OPERATOR_VERSION)/go/{bin,testbin,.cache}
 	test -h $${HOME:-~}/go || ln -s /shared/$(ARCH)/operator-sdk.$(OPERATOR_VERSION)/go/ $${HOME:-~}/go

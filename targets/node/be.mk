@@ -7,7 +7,7 @@ KIND_SITE_CLUSTER_NAMES ?= dev-eks-us-west-1-lms-01 dev-eks-us-east-1-lms-01
 KIO_WEB_APP_KUBECONFIG_NAME ?= local-kubeconfig-kio-web-app
 KIO_WEB_APP_KUBECONFIG ?= $(shell echo "$${HOME}/.kube/$(KIO_WEB_APP_KUBECONFIG_NAME)")
 KIO_WEB_APP_VAULT_ENVVARS_PATH ?= $(VAULT_LOCAL_MOUNT_POINT)/config/be/envvars
-IMAGE_PULL_SECRET_NS ?= kio-operator-system
+IMAGE_PULL_SECRET_NS ?= lms-moodle-operator-system
 export KUBECONFIG := $(KIO_WEB_APP_KUBECONFIG)
 
 .PHONY: install
@@ -77,7 +77,7 @@ kind-create-site-clusters: kind ## Create/Start kind clusters for sites
 		$(MAKE) kind-create kind-start; \
 		$(KUBECTL) config rename-context kind-$${cluster} $${cluster} || echo ignoring; \
 		$(MAKE) kind-context; \
-		$(MAKE) deploy-csi-driver-nfs deploy-kio-operators image-pull-secret api-endpoint-dns; \
+		$(MAKE) deploy-csi-driver-nfs deploy-lms-moodle-operators image-pull-secret api-endpoint-dns; \
 	done
 
 .PHONY: kind-delete-site-clusters
@@ -108,15 +108,15 @@ image-pull-secret: vault ## Download and store image pull secret
 	@echo -e "${YELLOW}++ VAULT_ADDR=$(VAULT_ADDR)${RESET}"
 	@$(KUBECTL) -n $(IMAGE_PULL_SECRET_NS) get secret kio-web-app-dev-pull-secret -o name || $(VAULT) kv get -field regcred $(VAULT_INTERNAL_MOUNT_POINT)/registry/quay/kio-web-app-reader | $(KUBECTL) -n $(IMAGE_PULL_SECRET_NS) create secret docker-registry kio-web-app-dev-pull-secret --from-file=.dockerconfigjson=/dev/stdin
 
-.PHONY: deploy-kio-operators
-deploy-kio-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in current cluster
+.PHONY: deploy-lms-moodle-operators
+deploy-lms-moodle-operators: ## Deploy kio operator and dependant operators to the K8s cluster specified in current cluster
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(KUSTOMIZE) build .config/local/kio/operators | $(KUBECTL) apply -f -
 	@sleep 1
 	@$(KUSTOMIZE) build .config/local/kio/flavor | $(KUBECTL) apply -f -
 
-.PHONY: undeploy-kio-operators
-undeploy-kio-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in current cluster
+.PHONY: undeploy-lms-moodle-operators
+undeploy-lms-moodle-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in current cluster
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s Site --all
 	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s Flavor --all

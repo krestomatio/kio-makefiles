@@ -4,7 +4,7 @@ Makifiles for Operator SDK operators:
 - rename operator sdk `Makefile` to `Makefile-dist.mk`
 - define a new `Makefile`. Ex:
 ```makefile
-OPERATOR_SHORTNAME ?= kio
+OPERATOR_SHORTNAME ?= lms-moodle
 VERSION ?= 0.0.2
 OPERATOR_TYPE ?= go
 
