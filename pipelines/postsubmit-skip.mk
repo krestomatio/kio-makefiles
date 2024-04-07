@@ -3,6 +3,11 @@ multiarch-image:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping multiarch-image...)
 
+.PHONY: bundling
+bundling:
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info skipping bundling...)
+
 .PHONY: changelog
 changelog:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
