@@ -150,6 +150,9 @@ VAULT_LOCAL_MOUNT_POINT ?= kio-web-app-local
 ## Makejinja
 MAKEJINJA_DOCS_DATA ?= -D operator_version=$(VERSION)
 
+## Others
+COMMUNITY_OPERATOR_REPO_PATH ?= ../community-operators
+
 # colors
 ## from https://gist.github.com/rsperl/d2dfe88a520968fbc1f49db0a29345b9
 ## define standard colors

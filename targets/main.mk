@@ -425,6 +425,11 @@ else
 	@echo -e "${YELLOW}++ not deleting: '$(LOCAL_BIN)'${RESET}"
 endif
 
+.PHONY: community-operator-sync
+community-operator-sync: ## Sync operator bundle to community operator folder
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	rsync -a -P ./bundle/ $(COMMUNITY_OPERATOR_REPO_PATH)/operators/$(COMMUNITY_OPERATOR_NAME)/$(VERSION)
+
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)
 endif
