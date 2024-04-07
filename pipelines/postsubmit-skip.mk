@@ -18,6 +18,11 @@ release:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	$(info skipping release...)
 
+.PHONY: bundle-catalog
+bundle-catalog:
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	$(info skipping bundle-catalog...)
+
 .PHONY: promote
 promote:
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
