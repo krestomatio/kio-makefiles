@@ -40,3 +40,8 @@ collection-install: ## Install krestomatio collection from git
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@echo -e "${YELLOW}++ krestomatio collection already installed...${RESET}"
 endif
+
+.PHONY: ansible-lint
+ansible-lint: ## Ansible linting
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	ansible-lint playbooks/
