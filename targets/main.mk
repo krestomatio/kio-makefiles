@@ -430,6 +430,14 @@ community-operator-sync: ## Sync operator bundle to community operator folder
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	rsync -a -P ./bundle/ $(COMMUNITY_OPERATOR_REPO_PATH)/operators/$(COMMUNITY_OPERATOR_NAME)/$(VERSION)
 
+.PHONY: bundle-set-values
+bundle-set-values: ## Set bundle values
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	sed -i "s@containerImage:.*@containerImage: $(IMG)@" bundle/manifests/*.clusterserviceversion.yaml
+
+.PHONY: bundle-update
+bundle-update: bundle bundle-set-values ## Update bundle
+
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)
 endif

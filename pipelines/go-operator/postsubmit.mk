@@ -5,7 +5,7 @@ multiarch-image: buildx-use buildx-image
 changelog: jx-changelog ## Generate changelog
 
 .PHONY: release
-release: set-manager-image skopeo-copy bundle gen-operators-kustomization gen-docs ## Run release tasks
+release: set-manager-image skopeo-copy bundle-update gen-operators-kustomization gen-docs ## Run release tasks
 
 .PHONY: bundle-catalog
 bundle-catalog: bundle-build bundle-push catalog-build catalog-push ## Release bundle and catalog
