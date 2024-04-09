@@ -33,7 +33,7 @@ help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 .PHONY: kustomize
-KUSTOMIZE = $(LOCAL_BIN)/kustomize
+KUSTOMIZE = $(LOCALBIN)/kustomize
 kustomize: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUSTOMIZE)))
@@ -104,7 +104,7 @@ else
 endif
 
 .PHONY: skaffold
-SKAFFOLD = $(LOCAL_BIN)/skaffold
+SKAFFOLD = $(LOCALBIN)/skaffold
 skaffold: ## Download kustomize locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(SKAFFOLD)))
@@ -122,7 +122,7 @@ endif
 endif
 
 .PHONY: kubectl
-KUBECTL = $(LOCAL_BIN)/kubectl
+KUBECTL = $(LOCALBIN)/kubectl
 kubectl: ## Download kubectl locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KUBECTL)))
@@ -140,7 +140,7 @@ endif
 endif
 
 .PHONY: kind
-KIND = $(LOCAL_BIN)/kind
+KIND = $(LOCALBIN)/kind
 kind: ## Download kind locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(KIND)))
@@ -177,7 +177,7 @@ endif
 endif
 
 .PHONY: frpc
-FRPC = $(LOCAL_BIN)/frpc
+FRPC = $(LOCALBIN)/frpc
 frpc: ## Download frpc locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(FRPC)))
@@ -250,7 +250,7 @@ undeploy-csi-driver-nfs: ## Undeploy CSI NFS from the K8s cluster specified in ~
 	@$(KUSTOMIZE) build $(CSI_NFS_BASE_URL_INSTALL) | $(KUBECTL) delete -f -
 
 .PHONY: vault
-VAULT = $(LOCAL_BIN)/vault
+VAULT = $(LOCALBIN)/vault
 vault: ## Download vault CLI locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(VAULT)))
@@ -269,7 +269,7 @@ endif
 endif
 
 .PHONY: envconsul
-ENVCONSUL = $(LOCAL_BIN)/envconsul
+ENVCONSUL = $(LOCALBIN)/envconsul
 envconsul: ## Download envconsul CLI locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq (,$(wildcard $(ENVCONSUL)))
@@ -417,12 +417,12 @@ buildx-k8s-multiarch: buildx ## Create buildx k8s multiarch instance builder
 .PHONY: delete-project-bin
 delete-project-bin: ## Delete relative bin directory
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-ifeq ($(LOCAL_BIN),./bin)
+ifeq ($(LOCALBIN),./bin)
 	-rm -f ./bin/*
 	-rmdir ./bin/
 else
-	@echo -e "${YELLOW}++ bin directory is outside of project: $(LOCAL_BIN)${RESET}"
-	@echo -e "${YELLOW}++ not deleting: '$(LOCAL_BIN)'${RESET}"
+	@echo -e "${YELLOW}++ bin directory is outside of project: $(LOCALBIN)${RESET}"
+	@echo -e "${YELLOW}++ not deleting: '$(LOCALBIN)'${RESET}"
 endif
 
 .PHONY: community-operator-sync
