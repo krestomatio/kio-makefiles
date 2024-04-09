@@ -158,7 +158,7 @@ endif
 endif
 
 .PHONY: buildx
-BUILDX =  $(HOME)/.docker/cli-plugins/docker-buildx
+BUILDX = $(HOME)/.docker/cli-plugins/docker-buildx
 buildx: buildx_version = $(call github_latest_release_version,https://github.com/docker/buildx)
 buildx: ## Download buildx locally if necessary.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
@@ -192,6 +192,25 @@ ifeq (,$(shell which frpc 2>/dev/null))
 	}
 else
 FRPC = $(shell which frpc)
+endif
+endif
+
+.PHONY: fetch
+FETCH = $(LOCALBIN)/fetch
+fetch: fetch_version = $(call github_latest_release_version,https://github.com/gruntwork-io/fetch)
+fetch: ## Download fetch locally if necessary.
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+ifeq (,$(wildcard $(FETCH)))
+ifeq (,$(shell which fetch 2>/dev/null))
+	@echo -e "${YELLOW}++ Downloading fetch to $(FETCH)${RESET}"
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(FETCH)) ;\
+	curl -sSL "https://github.com/gruntwork-io/fetch/releases/download/v$(fetch_version)/fetch_$(OS)_$(ARCH)" -o $(FETCH) ;\
+	chmod +x $(FETCH) ;\
+	}
+else
+FETCH = $(shell which fetch)
 endif
 endif
 
