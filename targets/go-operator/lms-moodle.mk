@@ -22,6 +22,16 @@ gen-operators-kustomization: ## Generate operators kustomization files
 		-D nfs_operator_version=$(NFS_OPERATOR_VERSION) \
 		-D keydb_operator_version=$(KEYDB_OPERATOR_VERSION)
 
+.PHONY: gen-bundle-dependencies
+gen-bundle-dependencies: ## Generate bundle dependencies file
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	makejinja -i config/templates/metadata -o bundle/metadata -f --undefined strict \
+		--jinja-suffix .j2 \
+		-D moodle_operator_version=$(MOODLE_OPERATOR_VERSION) \
+		-D postgres_operator_version=$(POSTGRES_OPERATOR_VERSION) \
+		-D nfs_operator_version=$(NFS_OPERATOR_VERSION) \
+		-D keydb_operator_version=$(KEYDB_OPERATOR_VERSION)
+
 .PHONY: testing-deploy
 testing-deploy: gen-operators-kustomization testing-deploy-prepare testing-deploy-apply-safe testing-deploy-samples-safe ## Test deployment using kustomize
 
