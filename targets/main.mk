@@ -27,7 +27,7 @@ test "$$vault_json" && echo "$$vault_json" | sort > "$(2)"
 endef
 
 ## General targets
-ifneq ($(PROJECT_TYPE),go-operator)
+ifeq ($(OPERATOR_TYPE),)
 .PHONY: help
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -441,6 +441,12 @@ endif
 
 .PHONY: bundle-update
 bundle-update: bundle bundle-set-values ## Update bundle
+
+.PHONY: gen-docs
+gen-docs: ## Generate docs
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	makejinja -i '$(MAKEJINJA_DOCS_TEMPLATE_PATH)' -o 'docs/' -f --undefined strict --jinja-suffix .j2 \
+		$(MAKEJINJA_DOCS_DATA)
 
 ifneq (,$(wildcard $(MK_TARGET_CUSTOM_FILE)))
 include $(MK_TARGET_CUSTOM_FILE)

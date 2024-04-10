@@ -38,12 +38,6 @@ gen-api-docs: go-crd-ref-docs-install ## Generate api docs
 		--config=config/docs/go-crd-ref-docs.yaml \
 		--output-path=docs/api.md
 
-.PHONY: gen-docs
-gen-docs: ## Generate docs
-	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	makejinja -i config/templates/docs -o docs/ -f --undefined strict --jinja-suffix .j2 \
-		$(MAKEJINJA_DOCS_DATA)
-
 .PHONY: go-operator-cache
 go-operator-cache: ## Configure go operator cache
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"

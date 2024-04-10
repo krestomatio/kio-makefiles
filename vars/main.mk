@@ -153,6 +153,7 @@ VAULT_LOCAL_MOUNT_POINT ?= kio-web-app-local
 
 ## Makejinja
 MAKEJINJA_DOCS_DATA ?= -D operator_version=$(VERSION)
+MAKEJINJA_DOCS_TEMPLATE_PATH ?= config/templates/docs
 
 ## Others
 COMMUNITY_OPERATOR_REPO_PATH ?= ../community-operators
