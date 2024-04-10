@@ -80,7 +80,7 @@ testing-deploy-samples-safe: ## Try test deployment samples
 testing-deploy-samples: ## Test deployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | $(KUBECTL) apply -f -
-	$(KUBECTL) wait --for=condition=ready --timeout=1200s Site site-sample
+	$(KUBECTL) wait --for=condition=ready --timeout=1200s LMSMoodle site-sample
 
 .PHONY: testing-undeploy
 testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undeploy-restore ## Test undeployment using kustomize

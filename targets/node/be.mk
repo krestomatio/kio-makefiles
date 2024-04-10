@@ -113,13 +113,13 @@ deploy-lms-moodle-operators: ## Deploy kio operator and dependant operators to t
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	@$(KUSTOMIZE) build .config/local/kio/operators | $(KUBECTL) apply -f -
 	@sleep 1
-	@$(KUSTOMIZE) build .config/local/kio/flavor | $(KUBECTL) apply -f -
+	@$(KUSTOMIZE) build .config/local/kio/templates | $(KUBECTL) apply -f -
 
 .PHONY: undeploy-lms-moodle-operators
 undeploy-lms-moodle-operators: ## Undeploy kio operator and dependant operators from the K8s cluster specified in current cluster
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s Site --all
-	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s Flavor --all
+	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s LMSMoodle --all
+	@$(KUBECTL) delete --ignore-not-found=true --timeout=600s LMSMoodleTemplate --all
 	@$(KUSTOMIZE) build .config/local/kio/operators/ | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f -
 
 .PHONY: api-endpoint-dns
