@@ -453,10 +453,8 @@ community-operator-sync: ## Sync operator bundle to community operator folder
 bundle-set-values: ## Set bundle values
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	sed -i "s@containerImage:.*@containerImage: $(IMG)@" bundle/manifests/*.clusterserviceversion.yaml
-ifneq ($(BUNDLE_PACKAGE_NAME_LABEL),)
-	sed -i "s@operators.operatorframework.io.bundle.package.v1:.*@operators.operatorframework.io.bundle.package.v1: $(BUNDLE_PACKAGE_NAME_LABEL)@" bundle/metadata/annotations.yaml
-	sed -i "s@operators.operatorframework.io.bundle.package.v1=.*@operators.operatorframework.io.bundle.package.v1=$(BUNDLE_PACKAGE_NAME_LABEL)@" bundle.Dockerfile
-endif
+	sed -i "s@operators.operatorframework.io.bundle.package.v1:.*@operators.operatorframework.io.bundle.package.v1: $(COMMUNITY_OPERATOR_NAME)@" bundle/metadata/annotations.yaml
+	sed -i "s@operators.operatorframework.io.bundle.package.v1=.*@operators.operatorframework.io.bundle.package.v1=$(COMMUNITY_OPERATOR_NAME)@" bundle.Dockerfile
 
 .PHONY: bundle-update
 bundle-update: bundle bundle-set-values ## Update bundle
