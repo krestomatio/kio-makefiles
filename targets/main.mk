@@ -67,10 +67,10 @@ start-dockerd: ## Start docker daemon in background (if not running) (meant to b
 image-build: ## Build container image with the manager.
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
-	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG) \
+	$(CONTAINER_BUILDER) build .  --ulimit="$(IMG_BUILD_ULIMIT)" -t $(BUILD_IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE) --build-arg VERSION=$(VERSION)
 else
-	$(CONTAINER_BUILDER) build . -t $(BUILD_IMG) --build-arg VERSION=$(VERSION)
+	$(CONTAINER_BUILDER) build .  --ulimit="$(IMG_BUILD_ULIMIT)" -t $(BUILD_IMG) --build-arg VERSION=$(VERSION)
 endif
 
 .PHONY: image-push
@@ -97,10 +97,10 @@ buildah-push: ## Push the container image using buildah
 buildx-image: ## Build container image with docker buildx
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 ifeq ($(PROJECT_TYPE),ansible-operator)
-	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) \
+	docker buildx build . --pull --push --ulimit="$(IMG_BUILD_ULIMIT)" --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) \
 		--build-arg COLLECTION_FILE=$(COLLECTION_FILE) --build-arg VERSION=$(VERSION)
 else
-	docker buildx build . --pull --push --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) --build-arg VERSION=$(VERSION)
+	docker buildx build . --pull --push --ulimit="$(IMG_BUILD_ULIMIT)" --progress=$(BUILDX_PROGRESS) --platform="linux/amd64" --platform="linux/arm64" -t $(BUILD_IMG) --build-arg VERSION=$(VERSION)
 endif
 
 .PHONY: skaffold

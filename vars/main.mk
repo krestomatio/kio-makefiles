@@ -25,6 +25,7 @@ IMAGE_TAG_BASE ?= $(REGISTRY_PATH)/$(REGISTRY_PROJECT_NAME)
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 IMG_MINOR ?= $(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION))).$(word 2,$(subst ., ,$(VERSION)))
 IMG_MAJOR ?= $(IMAGE_TAG_BASE):$(word 1,$(subst ., ,$(VERSION)))
+IMG_BUILD_ULIMIT ?= "nofile=1024:1024"
 
 # requirements
 CONTAINER_BUILDER ?= docker
