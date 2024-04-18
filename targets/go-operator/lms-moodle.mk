@@ -1,7 +1,7 @@
 ##@ Testing deploy
 
 KIND_CLUSTER_NAME ?= lms-moodle-operator
-KIND_NAMESPACE ?= site-sample
+KIND_NAMESPACE ?= lmsmoodle-sample
 
 .PHONY: local-install
 local-install: kustomize kubectl kind-create kind-context deploy-operators install ## Install a local dev env
@@ -80,7 +80,7 @@ testing-deploy-samples-safe: ## Try test deployment samples
 testing-deploy-samples: ## Test deployment samples
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
 	kustomize build config/samples | $(KUBECTL) apply -f -
-	$(KUBECTL) wait --for=condition=ready --timeout=1200s LMSMoodle site-sample
+	$(KUBECTL) wait --for=condition=ready --timeout=1200s LMSMoodle lmsmoodle-sample
 
 .PHONY: testing-undeploy
 testing-undeploy: testing-undeploy-samples testing-undeploy-delete testing-undeploy-restore ## Test undeployment using kustomize
@@ -104,7 +104,7 @@ testing-undeploy-delete: ## Test undeployment delete operators
 	kustomize build config/testing/nfs | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}nfs-operator@${TEST_OPERATOR_NAMEPREFIX}nfs@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
 	kustomize build config/testing/postgres | sed -e "s@${TEST_OPERATOR_NAMEPREFIX}postgres-operator@${TEST_OPERATOR_NAMEPREFIX}postgres@" | $(KUBECTL) delete --ignore-not-found=true --timeout=600s -f - || echo
 	# in case sc remains
-	$(KUBECTL) delete --ignore-not-found=true sc site-site-sample-nfs-sc || echo
+	$(KUBECTL) delete --ignore-not-found=true sc site-lmsmoodle-sample-nfs-sc || echo
 
 .PHONY: testing-undeploy-restore
 testing-undeploy-restore: ## Test undeployment restore files
