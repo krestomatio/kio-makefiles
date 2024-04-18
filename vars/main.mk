@@ -47,7 +47,7 @@ ENVCONSUL_VERSION ?= 0.13.2
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
 CWD := $(shell pwd)
-LOCALBIN ?= ./bin
+LOCALBIN ?= $(shell pwd)/bin
 PATH := $(PATH):$(LOCALBIN)
 
 # JX
