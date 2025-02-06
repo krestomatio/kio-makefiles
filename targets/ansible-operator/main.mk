@@ -4,7 +4,7 @@
 .PHONY: molecule
 molecule: ## Testing with molecule
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	set -e; molecule $(MOLECULE_SEQUENCE) -s $(MOLECULE_SCENARIO)
+	set -e; molecule --debug $(MOLECULE_SEQUENCE) -s $(MOLECULE_SCENARIO)
 
 .PHONY: collection-build
 collection-build: ## Build krestomatio collection from path or git to file
