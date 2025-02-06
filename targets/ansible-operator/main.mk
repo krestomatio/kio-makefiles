@@ -39,4 +39,4 @@ endif
 .PHONY: ansible-lint
 ansible-lint: ## Ansible linting
 	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
-	ansible-lint -c $(PWD)/.ansible-lint --project-dir $(PWD)/playbooks/ .
+	ansible-lint -c $(CWD)/.ansible-lint --project-dir $(CWD)/playbooks/ .
