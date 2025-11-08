@@ -69,6 +69,13 @@ npm-test-coverage: ## NPM testing with coverage
 	@echo -e "\nRunning 'npm run test:cov':"
 	@bash -l -c 'npm run test:cov'
 
+PHONY: npm-run
+npm-run: ## NPM run arbitrary command, pass NPM_CMD="command"
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\nRunning 'npm run $(NPM_CMD)':"
+	@bash -l -c 'npm run $(NPM_CMD)'
+
+
 ##@ FRP
 PHONY: frpc-ini-download-if
 frpc-ini-download-if: vault ## download frpc.ini file, but only if it does not exist on disk
