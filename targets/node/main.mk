@@ -57,6 +57,17 @@ npm-pretty: ## NPM pretty
 	@echo -e "\nRunning 'npm run pretty':"
 	@bash -l -c 'npm run pretty'
 
+PHONY: npm-test
+npm-test: ## NPM testing
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\nRunning 'npm test':"
+	@bash -l -c 'npm run test'
+
+PHONY: npm-test-coverage
+npm-test-coverage: ## NPM testing with coverage
+	@echo -e "${LIGHTPURPLE}+ make target: $@${RESET}"
+	@echo -e "\nRunning 'npm run test:cov':"
+	@bash -l -c 'npm run test:cov'
 
 ##@ FRP
 PHONY: frpc-ini-download-if
